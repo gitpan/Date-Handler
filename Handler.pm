@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '1.1';
+$VERSION = '1.2';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -283,7 +283,7 @@ sub GmtOffset
 	#my $local_time = timelocal( gmtime $self->{epoch} );
 
 
-	my $now = time();
+	my $now = $self->Epoch();
 	
 	my ($l_min, $l_hour, $l_year, $l_yday) = (localtime $now)[1, 2, 5, 7];
 	my ($g_min, $g_hour, $g_year, $g_yday) = (gmtime $now)[1, 2, 5, 7];

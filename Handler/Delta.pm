@@ -291,6 +291,7 @@ sub DeltaFromArray
 	my $input = shift;
   	my ($y,$m,$d,$hh,$mm,$ss) = @{$input}[0,1,2,3,4,5];
 
+	$y = 0 unless (defined $y);
 	$y = floor($y * 12);
 	$m += $y;
 	return [$m||0,($ss||0)+60*(($mm||0)+60*(($hh||0)+24*($d||0)))];

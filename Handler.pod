@@ -498,7 +498,7 @@ Benoit Beausejour <bbeausej@pobox.com>
 
 =item * Roland Rauch <roland@rauch.com>
 
-=item * Patrick Bradley <peanut@bustofindifference.com>
+=item * Patrick Bradley <peanut@burstofindifference.com>
 
 =item * Phillippe M. Chiasson <gozer@cpan.org>
 
@@ -507,6 +507,8 @@ Benoit Beausejour <bbeausej@pobox.com>
 =item * Ethan Joffe <ethan@namimedia.com>
 
 =item * Mathew Robertson <mathew.robertson@redsheriff.com>
+
+=item * Sivaguru Sankaridurg <uc_regents@yahoo.com>
 
 =back
 

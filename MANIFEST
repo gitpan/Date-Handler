@@ -19,3 +19,4 @@ t/4locale.t
 t/5intuitivemonth.t
 t/6stdmonth.t
 t/7intuitivedst.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -122,7 +122,6 @@ IMPLEMENTATION
     Using the Date::Handler is simple.
 
   Creating the absolute Date::Handler
-
     The new() constructor receives only one argument as a hashref:
 
             my $date = new Date::Handler({
@@ -142,6 +141,7 @@ IMPLEMENTATION
     * Anonymous array of the form: [y,m,d,h,mm,ss]
     * A hashref of the form : { year => y,month => m, day => d, hour => h,
     min => mm, sec => ss }
+
     The items in the array (or hash) of the 'date' key should follow these
     rules:
 
@@ -152,6 +152,7 @@ IMPLEMENTATION
     * min - The number of minutes after the hour, in the range 0 to 59.
     * sec - The number of seconds after the minute, normally in the range 0
     to 59.
+
     The optional 'time_zone' key represents the time zone name this date is
     considered in. i.e. Africa/Dakar, EST, PST, EDT
 
@@ -162,12 +163,10 @@ IMPLEMENTATION
     described in the "USING INTUITIVE MONTH CALCULATIONS" section.
 
   Accessors
-
     You can access the data inside the object using any of the provided
     methods. These methods are detailed in the SYNOPSIS up above.
 
   Modifying the object
-
     A created Date::Handler can be modified on the fly by many ways:
 
     * Changing the time_zone of the object using TimeZone()
@@ -198,7 +197,6 @@ IMPLEMENTATION
             print "Time in ".$date->Locale().": ".$date."\n";
 
   Operator overload special cases
-
     The Date::Handler overloaded operator have special cases. Refer to the
     SYNOPSIS to get a description of each overloaded operator's behaviour.
 
@@ -388,7 +386,6 @@ OTHER DATE::HANDLER MODULES
     Here is a brief description of the other modules in this package.
 
   Using Date::Handler::Delta objects
-
     To go forward or backward in time with a date object, you can use the
     Date::Handler::Delta objects. These objects represent a time lapse
     represented in months and seconds. Since Date::Handler uses operator
@@ -408,7 +405,6 @@ OTHER DATE::HANDLER MODULES
     Refer to the Date::Handler::Delta(1) documentation for more on Deltas.
 
   Using Date::Handler::Range objects
-
     Range objects are used to define a time range using a start date and a
     delta object. Can be useful to calculate recurrences of events and event
     overlap.
@@ -473,11 +469,13 @@ AUTHOR
 CONTRIBUTORS
     * Ron Savage <ron@savage.net.au>
     * Roland Rauch <roland@rauch.com>
-    * Patrick Bradley <peanut@bustofindifference.com>
+    * Patrick Bradley <peanut@burstofindifference.com>
     * Phillippe M. Chiasson <gozer@cpan.org>
     * Jamie Letual <jamie@letual.net>
     * Ethan Joffe <ethan@namimedia.com>
     * Mathew Robertson <mathew.robertson@redsheriff.com>
+    * Sivaguru Sankaridurg <uc_regents@yahoo.com>
+
 SEE ALSO
     Class::Date(1). Time::Object(1). Date::Calc(1). perl(1).
 

@@ -1,6 +1,11 @@
 Revision history for Perl extension Date::Handler.
 Maintained by <bbeausej@pobox.com>
 
+1.2  August 26 2003
+   - Included Mathew Robertson's patch to allow missing members in Delta constructer as hash. 
+	  (year fix mainly)
+	- Included Sivaguru Sankaridurg's fix to the GmtOffset method's aberration.
+
 1.1  Jan 7 2003
 	- Included Mathew Robertson's patch for FreeBSD undefined locale problem.
 
