@@ -7,5 +7,6 @@ WriteMakefile(
 	'VERSION_FROM'	=> 'Handler.pm', 
 	'AUTHOR'       => 'Benoit Beausejour <bbeausej\@pobox.com>',
 	'clean'        => { 'FILES' => 'pod2html*', },
-	'dist'    => { 'PREOP' => 'pod2text Handler.pm > README; pod2html Handler.pm > README.html', },
+	'dist'    	=> { 'PREOP' => 'pod2text Handler.pod > README; pod2html Handler.pod > README.html', },
 );
+

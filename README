@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
       use Date::Handler;
-     
+ 
       my $date = new Date::Handler({ date => time, time_zone => 'Europe/Paris', });
       my $date = new Date::Handler({ date => [2001,04,12,03,01,55], time_zone => 'EST', });
       my $date = new Date::Handler({ date => {
@@ -21,11 +21,11 @@ SYNOPSIS
 
        $date->new()                         Constructor
        $date->Year()                        2001
-       $date->Month()                       0..11
+       $date->Month()                       1..12
        $date->Day()                         1..31
-       $date->Hour()                        1..24
-       $date->Min()                         1..59
-       $date->Sec()                         1..59
+       $date->Hour()                        0..23
+       $date->Min()                         0..59
+       $date->Sec()                         0..59
        $date->Epoch($epoch)                 Seconds since epoch (GMT)
        $date->TimeZone()                    America/Montreal
        $date->TimeZoneName()                EST
@@ -37,7 +37,7 @@ SYNOPSIS
        $date->MonthName()                   April
        $date->WeekDay()                     1..7 (1 monday)
        $date->WeekDayName()                 Wednesday
-       $date->FirstWeekDayOfMonth() 1..7
+       $date->FirstWeekDayOfMonth()         1..7
        $date->WeekOfMonth()                 1..4
        $date->DaysInMonth()                 31,30,29,28 depending on month and year.
        $date->IsLeapYear()                  1 if true, 0 if false
@@ -51,7 +51,7 @@ SYNOPSIS
        $date->AsArray()                     Returns [y,m,d,h,mm,ss]
        $date->AsHash()                      Returns { year => y, month => m, day => d, hour => h, min => mm, sec => ss }
        $date->AllInfo()                     Returns a string containing all of the Object's related information.
-
+   
        my $delta = new Date::Handler::Delta([3,1,10,2,5,5]);
        my $delta = new Date::Handler::Delta({
                                                     years => 3,
@@ -61,7 +61,8 @@ SYNOPSIS
                                                     minutes => 5,
                                                     seconds => 5,
                                             });
-       $delta->new
+
+       $delta->new                          (More information in perldoc Date::Handler::Delta)
        $delta->Months()                     Number of months in delta
        $delta->Seconds()                    Number of seconds in delta
        $delta->AsScalar()                   "%d months and %d seconds"
@@ -82,25 +83,37 @@ SYNOPSIS
        $delta + n = (+n seconds)
        $delta - n = (-n seconds)
 
+       my $range = Date::Handler::Range->new({
+                                                    date => $date,
+                                                    delta => $delta,
+                                            });
+       my $range = Date::Handler::Range->new({
+                                                    date => [2001,06,08,2,00,00],
+                                                    delta => [0,0,1,0,0],
+                                            });
+
+       $range->new                  (More info in perldoc Date::Handler::Range)
+       $range->Direction()          Specifies the direction of a range ('FORWARDS' || 'BACKWARDS')
+       $range->StartDate()          Start Date::Handler object for this range and direction
+       $range->EndDate()            End Date::Handler object for this range and direction
+       $range->Overlaps($range2)    Returns true if range overlaps range2. undef otherwise.
+
 DESCRIPTION
-    Date::Handler is a container for dates that holds all the
-    methods to transform itself from Timezone to Timezone and format
-    itself. This module idea comes from an original version written
-    by dLux (Szabó, Balázs) <dlux@kapu.hu> in his module
-    Class::Date.
+    Date::Handler is a container for dates that holds all the methods to
+    transform itself from Timezone to Timezone and format itself. This
+    module idea comes from an original version written by dLux (Szabó,
+    Balázs) <dlux@kapu.hu> in his module Class::Date.
 
-    Date::Handler is implemented in pure Perl using POSIX modules,
-    it encapsulates the environnement variable TZ for it's time zone
-    management so you don't have to play with it externally in the
-    implementation.
+    Date::Handler is implemented in pure Perl using POSIX modules, it
+    encapsulates the environnement variable TZ for it's time zone management
+    so you don't have to play with it externally in the implementation.
 
-    It uses operator overloading and Delta date objects to
-    calculates time differences.
+    It uses operator overloading and Delta date objects to calculates time
+    differences.
 
-    This code is still in it's alpha stage(v0.05) and should not be
-    used on production systems without reviewing the actual test
-    cases provided with this module in the Date::Handler::Test
-    package.
+    This code is still in it's alpha stage(v0.05) and should not be used on
+    production systems without reviewing the actual test cases provided with
+    this module in the Date::Handler::Test package.
 
 IMPLEMENTATION
     Using the Date::Handler is simple.
@@ -118,15 +131,25 @@ IMPLEMENTATION
 
     * Epoch time
     * Anonymous array of the form: [y,m,d,h,mm,ss]
-    * A hashref of the form : { year => y,month => m, day => d, hour => h, min => mm, sec => ss }
+    * A hashref of the form : { year => y,month => m, day => d, hour => h,
+    min => mm, sec => ss }
+    The items in the array (or hash) of the 'date' key should follow these
+    rules:
+
+    * year - The year number
+    * mon - The number of months since January, in the range 1 to 12.
+    * day - The day of the month, in the range 1 to 31.
+    * hour - The number of hours past midnight, in the range 0 to 23.
+    * min - The number of minutes after the hour, in the range 0 to 59.
+    * sec - The number of seconds after the minute, normally in the range 0
+    to 59.
     The 'time_zone' key represents the time zone name this date is
-    considered in. i.e. Africa/Dakar, EST, PST
+    considered in. i.e. Africa/Dakar, EST, PST, EDT
 
   Accessors
 
-    You can access the data inside the object using any of the
-    provided methods. These methods are detailed in the SYNOPSIS up
-    above.
+    You can access the data inside the object using any of the provided
+    methods. These methods are detailed in the SYNOPSIS up above.
 
   Modifying the object
 
@@ -148,11 +171,11 @@ IMPLEMENTATION
 
   Using Date::Handler::Delta objects
 
-    To go forward or backward in time with a date object, you can
-    use the Date::Handler::Delta objects. These objects represent a
-    time lapse represented in months and seconds. Since
-    Date::Handler uses operator overloading, you can 'apply' a Delta
-    object on an absolute date simply by using '+' and '-'.
+    To go forward or backward in time with a date object, you can use the
+    Date::Handler::Delta objects. These objects represent a time lapse
+    represented in months and seconds. Since Date::Handler uses operator
+    overloading, you can 'apply' a Delta object on an absolute date simply
+    by using '+' and '-'.
 
     Example:
 
@@ -163,19 +186,53 @@ IMPLEMENTATION
 
             #$newdate is now one year in the furure.
             my $newdate = $date+$delta;
-            
-            
+        
     Refer to the Date::Handler::Delta(1) documentation for more on Deltas.
+
+  Using Date::Handler::Range objects
+
+    Range objects are used to specify moments in time between 2 dates. For
+    the moment, this functionnality is very primitive but will evolve in
+    future versions. Each range object is constructed by a base
+    Date::Handler object. Then combined to that is a Date::Handler::Delta
+    will specify the length of the range. Then thirdly, the range is given a
+    direction, either 'FORWARDS' or 'BACKWARDS' in time. From these three
+    values are calculated a start date and an end date.
+
+    Example:
+
+            #Creation of the range starting now, ending in 2 days.
+            my $range = Date::Handler::Range->new({
+                                                            date => time(),
+                                                            delta => [0,0,2,0,0],
+                                                    });
+
+            #This is already set to 'FORWARDS' by default.
+            $range->Direction('FORWARDS');
+
+            print "This range start ".$range->StartDate()." and ends ". $range->EndDate()."\n";
+
+            #Another range, starting at the end date of range 1, going backwards in time 7 days.
+            my $range2 = Date::Handler::Range->new({
+                                                            date => $range->StartDate(),
+                                                            delta => [0,0,7,0,0],
+                                                    });
+            $range2->Direction('BACKWARDS');
+
+            #This returns true if range overlaps range2.
+            $range->Overlaps($range2);
+
+    As I said earlier, the range functionnality is still very primitive, and
+    the interface might change.
 
   Operator overload special cases
 
-    The Date::Handler overloaded operator have special cases. Refer
-    to the SYNOPSIS to get a description of each overloaded
-    operator's behaviour.
+    The Date::Handler overloaded operator have special cases. Refer to the
+    SYNOPSIS to get a description of each overloaded operator's behaviour.
 
-    One special case of the overload is when adding an integer 'n'
-    to a Date::Handler's reference. This is treated as if 'n' was in
-    seconds. Same thing for substraction.
+    One special case of the overload is when adding an integer 'n' to a
+    Date::Handler's reference. This is treated as if 'n' was in seconds.
+    Same thing for substraction.
 
     Example Uses of the overload:
 
@@ -190,9 +247,9 @@ IMPLEMENTATION
                                             }});
             #Quoted string overload 
             print "Current date is $date\n";
-            
+        
             my $delta = new Date::Handler::Delta({ days => 5, });
-            
+        
             #'+' overload, now, $date is 5 days in the future.      
             $date += $delta;
 
@@ -206,64 +263,72 @@ IMPLEMENTATION
             }
 
 INHERITANCE
-    A useful way of using Date::Handler in your code is to implement
-    that a class that ISA Date::Handler. This way you can overload
-    methods through the inheritance tree and change the object's
-    behaviour to your needs.
+    A useful way of using Date::Handler in your code is to implement that a
+    class that ISA Date::Handler. This way you can overload methods through
+    the inheritance tree and change the object's behaviour to your needs.
 
-    Here is a small example of an overloaded class that specifies a
-    default timezone different than the machine's timezone.
+    Here is a small example of an overloaded class that specifies a default
+    timezone different than the machine's timezone.
 
             #!/usr/bin/perl
             package My::Date::Handler;
-            
+        
             use strict;
             use vars qw(@ISA $VERSION);
-            
+        
             use Date::Handler;
             @ISA = qw(Date::Handler);
-            
-            use constant DEFAULT_TIME_ZONE => 'Europe/Moscow';
-            
+        
+            use constant DEFAULT_TIMEZONE => 'Europe/Moscow';
+        
             sub TimeZone
             {
                     my ($self) = @_;
-            
+        
                     my $time_zone = $self->SUPER::TimeZone(@_);
-            
+        
                     return $time_zoneif defined $time_zone;
-            
-                    return $self->DEFAULT_TIME_ZONE();
+        
+                    return $self->DEFAULT_TIMEZONE();
             }       
-            
+        
             1;
             __END__
-                    
-    =head1 BUGS (known)
-
+                
+BUGS (known)
     Dates after 2038 are not handled by this module yet. (POSIX)
 
-    Dates before 1902 are not handled by this module. (POSIX)
+    Dates before 1970 are not handled by this module. (POSIX)
 
-    If you find bugs with this module, do not hesitate to contact
-    the author. Your comments and rants are welcomed :)
+    If you find bugs with this module, do not hesitate to contact the
+    author. Your comments and rants are welcomed :)
+
+CVS AND BLEEDING VERSIONS
+    The latest developments and changes history for this module are
+    available through cvsweb at:
+
+    http://cvs.flatlineconstruct.com/
+
+    The bleeding edge code is also available through anonymous CVS access
+    via:
+
+    cvs -d:pserver:anoncvs@cvs.flatlineconstruct.com:/home/cvs/anon checkout
+    Date-Handler
 
 TODO
-    Add support for dynamic locale using perllocales functions. This
-    will plugin directly with the use of strftime in the
-    Date::Handler and provide locales.
+    Add support for dynamic locale using perllocales functions. This will
+    plugin directly with the use of strftime in the Date::Handler and
+    provide locales.
 
-    Add a list of supported timezones in the Constants class.Just
-    didnt around to do it yet :) Feel free :) If you have patches,
-    recommendations or suggestions on this module, please come
-    forward :)
+    Add a list of supported timezones in the Constants class.Just didnt
+    around to do it yet :) Feel free :) If you have patches, recommendations
+    or suggestions on this module, please come forward :)
 
 COPYRIGHT
     Copyright(c) 2001 Benoit Beausejour <bbeausej@pobox.com>
 
-    All rights reserved. This program is free software; you can
-    redistribute it and/or modify it under the same terms as Perl
-    itself.
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
 
     Portions Copyright (c) Philippe M. Chiasson <gozer@cpan.org>
 

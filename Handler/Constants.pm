@@ -8,6 +8,8 @@ use vars qw(@ISA $VERSION @EXPORT $DAYS_IN_MONTH $SUPPORTED_TIME_ZONES);
 use Exporter;
 @ISA = qw(Exporter);
 
+$VERSION = '0.9';
+
 @EXPORT = qw($DAYS_IN_MONTH $SUPPORTED_TIME_ZONES);
 
 $DAYS_IN_MONTH = {

@@ -16,4 +16,16 @@ Maintained by <bbeausej@pobox.com>
 	-Change the format of Delta to months and seconds only.
 	-Fixed a bug when comparing 2 dates where one is dst the other std, it would return a missing hour.
 
-
+0.05  Wed Jun 5 12:00 2001
+	- CPAN release, minor bug fixes.
+0.06  Saturday Jul 8 2:00 2001
+	- Implemented the Range object for handling ranges with dates and deltas.
+	- Fixed a problem in Add() when encountering a date that's the last day of month. No idea how that
+	got in here. (Thanks to Fraser Speirs for this bug)
+	- Allowed divisions of Delta when they are expressed in the same units.
+	- Added ApproximateInSeconds() method to Deltas.
+	- IMPORTANT API Change: Month() method now returns a 1 based value like the others.
+	- Some new tests in make test.
+	- Added a DEFAULT_TIMEZONE constant for when no tz is passed to the constructor.
+	- Moved documentation to Handler.pod
+	- Some documentation updates concerning the constructor

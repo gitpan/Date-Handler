@@ -2,10 +2,15 @@ Changes
 MANIFEST
 README
 README.html
+.perltidyrc
+.cvsignore
 Makefile.PL
 Handler.pm
+Handler.pod
 Handler/Delta.pm
 Handler/Constants.pm
+Handler/Range.pm
 Handler/Test.pm
 t/0basic.t
 t/1ext.t
+t/2ext.t

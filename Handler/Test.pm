@@ -4,7 +4,7 @@ use strict;
 use Carp;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.1 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.3 $ =~ /: (\d+).(\d+)/;
 
 use Test;
 use Date::Handler;
@@ -13,15 +13,13 @@ use Data::Dumper;
 
 sub basic 
 {
-
 	#Tests basic concepts:
 	#date + delta = date
 	#delta + delta = delta
 	#delta - delta = delta
 	#delta * (+|-)n = (delta + delta [...n])
+
 	plan tests => 145;
-	#print "1..145\n";
-### Testing the delta format
 
 ## Testing basic delta equalities
 #1
@@ -614,7 +612,6 @@ ok(1);
 
 }
 
-__END__
 
 =head1 NAME
 
@@ -977,7 +974,7 @@ perl(1).
 #
 
 
-} # END OF TEST CASES
+#} # END OF TEST CASES
 
 #		
 #	}
@@ -1008,3 +1005,42 @@ perl(1).
 #
 #1;
 
+
+sub extended
+{
+ 	plan tests => 25;
+
+	#1
+	my $date = Date::Handler->new({ date => [2001,11,25,00,00] });
+	my $delta = Date::Handler::Delta->new([00,00,07,00,00,00]);
+	my $cdate = Date::Handler->new({ date => [2001,12,02,00,00]});
+	ok($date + $delta, Date::Handler->new({ date => [2001,12,02,00,00]}));
+
+	#2 - 13
+	$delta = Date::Handler::Delta->new([00,01,00,00,00,00]);
+	for(1..12)
+	{
+		my $date = Date::Handler->new({ date => [2001,$_,01,00,00] });
+	
+		my $cdate = Date::Handler->new({ date => [2001,$_+1, 01,00,00] });
+		
+		ok($date + $delta, $cdate);
+	}
+
+	my $count = 13;
+	for (1..12)
+	{
+		$count = $count - $_;
+	
+		my $date = Date::Handler->new({ date => [2005,$count,01,00,00] });
+		my $cdate = Date::Handler->new({ date => [2005,$count-1, 01,00,00] });
+		ok($date - $delta, $cdate);
+	}
+
+		
+	
+}	
+
+__END__
+
+1;	
