@@ -4,7 +4,7 @@ use strict;
 use Carp;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.5 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.6 $ =~ /: (\d+).(\d+)/;
 
 use Test;
 use Date::Handler;
@@ -1080,6 +1080,7 @@ sub extended_locale
 	my $day_spanish = $date->WeekDayName();
 
 	ok(lc $day_spanish, lc "miércoles");
+
 }
 
 

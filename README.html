@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-<TITLE>Date::Handler - Easy Date Object</TITLE>
+<TITLE>Date::Handler - Easy but complete date object</TITLE>
 <LINK REV="made" HREF="mailto:prospector@porky.devel.redhat.com">
 </HEAD>
 
@@ -44,7 +44,7 @@
 <HR>
 <P>
 <H1><A NAME="name">NAME</A></H1>
-<P>Date::Handler - Easy Date Object (0.09)</P>
+<P>Date::Handler - Easy but complete date object (0.10)</P>
 <P>
 <HR>
 <H1><A NAME="synopsis">SYNOPSIS</A></H1>
@@ -81,6 +81,7 @@
    $date-&gt;Epoch($epoch)                 Seconds since epoch (GMT)
    $date-&gt;TimeZone()                    America/Montreal,EST,PST and so on
    $date-&gt;Locale()                      french, en_US, fr_FR, spanish and so on
+   $date-&gt;LocaleRealName()              Current locale's real name on the system
    $date-&gt;TimeZoneName()                EST, PST and so on
    $date-&gt;LocalTime()                   localtime of the object's epoch 
    $date-&gt;TimeFormat($format_string)    strftime
@@ -172,7 +173,7 @@ reviewing the actual test cases provided with this module in the Date::Handler::
 <PRE>
         my $date = new Date::Handler({
                                 date =&gt; time,
-                                time_zone =&gt; Japan',
+                                time_zone =&gt; 'Japan',
                         });</PRE>
 <PRE>
         my $date = new Date::Handler({
@@ -331,7 +332,8 @@ timezone different than the machine's timezone.</P>
 <P>Date::Handler supports locales using POSIX <CODE>setlocale()</CODE> functions. The allowed values for the locale
 are listed (on most unix system) using the `locale -a` command. The Date::Handler defaults to ``en_US'' for
 it's locale when no locale are passed to the constructor. The constant DEFAULT_LOCALE can be overloaded
-to change this behaviour.</P>
+to change this behaviour. Special note that the locales ``english'' and ``en'' are not implemented on most linux 
+(Red Hat here) systems. You need to use the locale en_US, en_GB etc etc.</P>
 <P>Date::Handler supports time zones using POSIX <CODE>tzset()</CODE> and <CODE>tzname()</CODE> functions. The allowed values for the
 time_zone key are listed (on linux systems) by look at the /usr/share/zoneinfo directory. The Date::Handler
 default to ``GMT'' for it's time zone when to time_zone key are passed to the constructor. The constant DEFAULT_TIME_ZONE
@@ -395,6 +397,7 @@ Your comments and rants are welcomed :)</P>
 <P><A HREF="http://cvs.flatlineconstruct.com/">http://cvs.flatlineconstruct.com/</A></P>
 <P>The bleeding edge code is also available through anonymous CVS access via:</P>
 <P>cvs <A HREF="mailto:-d:pserver:anoncvs@cvs.flatlineconstruct.com:/home/cvs/anon">-d:pserver:anoncvs@cvs.flatlineconstruct.com:/home/cvs/anon</A> checkout Date-Handler</P>
+<P>Please, if you use this module in a project, let me know!</P>
 <P>
 <HR>
 <H1><A NAME="todo">TODO</A></H1>

@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -140,14 +140,30 @@ sub Locale
 	{
 		my $locale = shift;
 
-		$self->{locale} = $locale;
-	}
+		my $locale_return = POSIX::setlocale(&POSIX::LC_TIME, $locale);
 
-	setlocale(&POSIX::LC_TIME, $self->{locale});
+		if( defined $locale_return )
+		{
+			$self->{locale} = $locale;
+			$self->{locale_realname} = $locale_return;
+		}
+		else
+		{
+
+			print STDERR "Locale $locale does not seem to be implemented on this system, keeping locale ".$self->{locale}."\n";
+		}
+	}
 
 	return $self->{locale} || $self->DEFAULT_LOCALE();
 }
 
+sub LocaleRealName
+{
+	my $self = shift;
+
+	return $self->{locale_realname} || $self->DEFAULT_LOCALE();
+}
+	
 #Time Conversion and info methods 
 
 sub TimeZoneName
@@ -584,6 +600,7 @@ sub AllInfo
 	$out_string .= "TimeFormat: ".$self->TimeFormat()."\n";
 	$out_string .= "Epoch: ".$self->Epoch()."\n";
 	$out_string .= "Locale: ".$self->Locale()."\n";
+	$out_string .= "LocaleRealName: ".$self->LocaleRealName()."\n";
 	$out_string .= "TimeZone: ".$self->TimeZone()." (".$self->TimeZoneName().")\n";
 	$out_string .= "DayLightSavings: ".$self->DayLightSavings()."\n";
 	$out_string .= "GMT Time: ".$self->GmtTime()."\n";	

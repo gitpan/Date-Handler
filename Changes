@@ -1,23 +1,30 @@
-Revision history for Perl extension Date::Object.
+Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
-0.01  Wed Apr  4 23:42:48 2001
-	- original version; created by h2xs 1.20 with options
-		-n Date::Object
+0.10 Sept 26 2001
+	- Implemented $date->LocaleRealName() from the return of setlocale()
+	- Calling $date->Locale() with an unknown locale will now warn the user.
+	- Fixed the problem when an unknow locale was given to Locale and the locale key was desynched
 
-0.02  Wed Apr 5 23:00:00 2001
-	- implemented most of the core features.
-	- Created the Delta object
-	- Abstraced the Constants class
+0.09 Aug 29 2001
+	- Implemented support for localisation using POSIX setlocale().
+	- Documentation update for localisation support
+	- Test cases name change to be more representative
 
-0.03  Wed Apr 6 12:00:00 2001
-	-Added documentation
-	-Fixed minor bugs	
-	-Change the format of Delta to months and seconds only.
-	-Fixed a bug when comparing 2 dates where one is dst the other std, it would return a missing hour.
+0.08 date Jul 15 2001 
+	- Fixed inheritance problem in Date::Handler::Add()
+	- Fixed inheritance problems in Date::Handler::Sub()
+	- Fixed inheritance problems in Date::Handler::Incr()
+	- Fixed inheritance problems in Date::Handler::Neg()
+	- Fixed inheritance problems with Delta objects
+	- Now support for classic style argument passing in constructor, thanks to Roland Rauch <roland@rauch.com> for the spot
+	- Added contributors in Handler.pod.
 
-0.05  Wed Jun 5 12:00 2001
-	- CPAN release, minor bug fixes.
+
+0.07 Sun Jul 11 3:52PM 2001
+	- Moved Range documentation to Range.pm
+	- Some documentation update in Handler.pod
+	- Fixed a problem in Range objects when passing 'BACKWARDS' or 'FORWARDS' to the Direction() method.
 
 0.06  Saturday Jul 8 2:00 2001
 	- Implemented the Range object for handling ranges with dates and deltas.
@@ -31,21 +38,22 @@ Maintained by <bbeausej@pobox.com>
 	- Moved documentation to Handler.pod
 	- Some documentation updates concerning the constructor
 
-0.07 Sun Jul 11 3:52PM 2001
-	- Moved Range documentation to Range.pm
-	- Some documentation update in Handler.pod
-	- Fixed a problem in Range objects when passing 'BACKWARDS' or 'FORWARDS' to the Direction() method.
+0.05  Wed Jun 5 12:00 2001
+	- CPAN release, minor bug fixes.
 
-0.08 date Jul 15 2001 
-	- Fixed inheritance problem in Date::Handler::Add()
-	- Fixed inheritance problems in Date::Handler::Sub()
-	- Fixed inheritance problems in Date::Handler::Incr()
-	- Fixed inheritance problems in Date::Handler::Neg()
-	- Fixed inheritance problems with Delta objects
-	- Now support for classic style argument passing in constructor, thanks to Roland Rauch <roland@rauch.com> for the spot
-	- Added contributors in Handler.pod.
+0.03  Wed Apr 6 12:00:00 2001
+	-Added documentation
+	-Fixed minor bugs	
+	-Change the format of Delta to months and seconds only.
+	-Fixed a bug when comparing 2 dates where one is dst the other std, it would return a missing hour.
 
-0.09 Aug 29 2001
-	- Implemented support for localisation using POSIX setlocale().
-	- Documentation update for localisation support
-	- Test cases name change to be more representative
+
+0.02  Wed Apr 5 23:00:00 2001
+	- implemented most of the core features.
+	- Created the Delta object
+	- Abstraced the Constants class
+
+0.01  Wed Apr  4 23:42:48 2001
+	- original version; created by h2xs 1.20 with options
+		-n Date::Object
+
