@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -397,10 +397,9 @@ sub IsLeapYear
 	local $ENV{'LC_TIME'} = $self->Locale();
 
 	my $year = $self->Year();
-
-	return 1 if(!($year % 400));
-	return 0 if(($year %100));
-	return 1 if(!($year % 4));
+ 
+	return 1 if( !($year % 400) );
+	return 1 if( !($year %4) && ($year % 100) );
 	return 0;
 }
 

@@ -1,6 +1,9 @@
 Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
+0.22 Oct 23 2001
+	- Fixed a stupid precedence bug in IsLeapYear()
+
 0.11 Oct 18 2001
 	- Fixed bug with constructor and unknown locales, now passing through Locale()
 	- Made the locale tests optionnal in make test since some systems don't have locales installed by default (OBSD)
