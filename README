@@ -326,6 +326,10 @@ COPYRIGHT
 AUTHOR
     Benoit Beausejour <bbeausej@pobox.com>
 
+CONTRIBUTORS
+    Roland Rauch <roland@rauch.com> Phillippe M. Chiasson <gozer@cpan.org>
+    Patrick Bradley <peanut@burstofindifference>
+
 SEE ALSO
     Class::Date(1). Time::Object(1). Date::Calc(1). perl(1).
 

@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use POSIX qw(floor strftime mktime);
 
@@ -31,7 +31,16 @@ use overload (
 
 sub new
 {
-	my ($classname, $args) = @_;
+	my $classname = shift;
+	my $args = shift;
+
+
+	# Allow classic style arguments passing. # Thanks to Roland Rauch <roland@rauch.com> for the spot 
+	unless (ref($args) eq "HASH") 
+	{ 
+		unshift(@_, $args);             
+		$args = {@_};                
+	}
 
 	my $self = {};
 	bless $self, $classname;
@@ -401,7 +410,7 @@ sub Add
 
 		my $epoch = $self->{epoch};
 
-		my $newdate = new Date::Handler({ date => $epoch, time_zone => $self->TimeZone() });
+		my $newdate = ref($self)->new({ date => $epoch, time_zone => $self->TimeZone() });
 
 		#Take care of the seconds.
 		$epoch += $delta->Seconds();
@@ -417,7 +426,7 @@ sub Add
 		#Take care of the years.
 		$self_array->[0] += $years;
 
-		my $return_date =  new Date::Handler({ date => $self_array, time_zone => $self->TimeZone() });
+		my $return_date =  ref($self)->new({ date => $self_array, time_zone => $self->TimeZone() });
 			
 		return $return_date;
 
@@ -464,7 +473,7 @@ sub Sub
 			$seconds += 3600;
 		}
 
-		return Date::Handler::Delta->new($seconds);
+		return $self->DELTA_CLASS()->new($seconds);
 	}
 	else
 	{
@@ -506,7 +515,7 @@ sub Incr
 	my $epoch = $self->{epoch};
 	$epoch++;
 
-	return new Date::Handler({ date => $epoch, time_zone => $self->TimeZone() });
+	return ref($self)->new({ date => $epoch, time_zone => $self->TimeZone() });
 }
 
 

@@ -359,6 +359,12 @@ Portions Copyright (c) Larry Rosler
 
 Benoit Beausejour <bbeausej@pobox.com>
 
+=head1 CONTRIBUTORS
+
+Roland Rauch <roland@rauch.com>
+Phillippe M. Chiasson <gozer@cpan.org>
+Patrick Bradley <peanut@burstofindifference>
+
 =head1 SEE ALSO
 
 Class::Date(1).

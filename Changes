@@ -18,6 +18,7 @@ Maintained by <bbeausej@pobox.com>
 
 0.05  Wed Jun 5 12:00 2001
 	- CPAN release, minor bug fixes.
+
 0.06  Saturday Jul 8 2:00 2001
 	- Implemented the Range object for handling ranges with dates and deltas.
 	- Fixed a problem in Add() when encountering a date that's the last day of month. No idea how that
@@ -29,7 +30,17 @@ Maintained by <bbeausej@pobox.com>
 	- Added a DEFAULT_TIMEZONE constant for when no tz is passed to the constructor.
 	- Moved documentation to Handler.pod
 	- Some documentation updates concerning the constructor
+
 0.07 Sun Jul 11 3:52PM 2001
 	- Moved Range documentation to Range.pm
 	- Some documentation update in Handler.pod
 	- Fixed a problem in Range objects when passing 'BACKWARDS' or 'FORWARDS' to the Direction() method.
+
+0.08 date TBA
+	- Fixed inheritance problem in Date::Handler::Add()
+	- Fixed inheritance problems in Date::Handler::Sub()
+	- Fixed inheritance problems in Date::Handler::Incr()
+	- Fixed inheritance problems in Date::Handler::Neg()
+	- Fixed inheritance problems with Delta objects
+	- Now support for classic style argument passing in constructor, thanks to Roland Rauch <roland@rauch.com> for the spot
+	- Added contributors in Handler.pod.

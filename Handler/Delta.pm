@@ -5,8 +5,7 @@ use strict;
 use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
-
-$VERSION = '0,07';
+$VERSION = '0.08';
 
 use POSIX qw(floor strftime mktime);
 
@@ -101,6 +100,7 @@ sub Add
 {
 	my ($self, $delta) = @_;
 
+
 	my $self_array = $self->AsArray();
 
 	if(!ref($delta))
@@ -121,7 +121,7 @@ sub Add
 		$self_array->[1] += $delta;
 	}
 
-	return new Date::Handler::Delta([0, $self_array->[0], 0,0,0,$self_array->[1]]);
+	return ref($self)->new([0, $self_array->[0], 0,0,0,$self_array->[1]]);
 }
 
 sub Sub 
@@ -164,7 +164,7 @@ sub Mul
 		my $months = $self->Months() * $delta;
 		my $seconds = $self->Seconds() * $delta;
 
-		return new Date::Handler::Delta([0, $months,0,0,0,$seconds]);
+		return ref($self)->new([0, $months,0,0,0,$seconds]);
 	}
 	elsif($delta->isa('Date::Handler::Delta'))
 	{
@@ -179,7 +179,7 @@ sub Mul
 		my $months = $self->Months() * $delta;
 		my $seconds = $self->Seconds() * $delta;
 
-		return new Date::Handler::Delta([0, $months,0,0,0,$seconds]);
+		return ref($self)->new([0, $months,0,0,0,$seconds]);
 	}
 
 }
@@ -192,7 +192,7 @@ sub Div
 		my $months = floor($self->Months() / $delta);
 		my $seconds = floor($self->Seconds() / $delta);
 
-		return new Date::Handler::Delta([0, $months,0,0,0,$seconds]);
+		return ref($self)->new([0, $months,0,0,0,$seconds]);
 	}
 	elsif($delta->isa('Date::Handler::Delta'))
 	{
@@ -229,7 +229,7 @@ sub Div
 		my $months = floor($self->Months() / $delta);
 		my $seconds = floor($self->Seconds() / $delta);
 
-		return new Date::Handler::Delta([0, $months,0,0,0,$seconds]);
+		return ref($self)->new([0, $months,0,0,0,$seconds]);
 	}
 }
 
@@ -270,14 +270,14 @@ sub Incr
 
 	my $secs = $self->Seconds();
 
-	return new Date::Handler::Delta([0, $self->Months(),0,0,0,$secs++]);
+	return ref($self)->new([0, $self->Months(),0,0,0,$secs++]);
 }
 
 sub Neg
 {
 	my $self = shift;
 
-	return new Date::Handler::Delta([0, -$self->Months(),0,0,0,-$self->Seconds()]);
+	return ref($self)->new([0, -$self->Months(),0,0,0,-$self->Seconds()]);
 }
 
 
