@@ -1,6 +1,6 @@
 =head1 NAME
 
-Date::Handler - Easy but complete date object (0.12)
+Date::Handler - Easy but complete date object (0.13)
 
 =head1 SYNOPSIS
 
@@ -34,6 +34,7 @@ Date::Handler - Easy but complete date object (0.12)
    $date->Epoch($epoch)			Seconds since epoch (GMT)
    $date->TimeZone()			America/Montreal,EST,PST and so on
    $date->Locale()			french, en_US, fr_FR, spanish and so on
+   $date->SetLocale(locale)		Set the locale to the argument, returns locale or undef.
    $date->LocaleRealName()		Current locale's real name on the system
    $date->TimeZoneName()		EST, PST and so on
    $date->LocalTime()			localtime of the object's epoch 
@@ -188,7 +189,7 @@ A created Date::Handler can be modified on the fly by many ways:
 
 =item * Changing the time_zone of the object using TimeZone()
 
-=item * Changing the object's locale on the fly using Locale()
+=item * Changing the object's locale on the fly using SetLocale()
 
 =item * Changing the internal date of the object using Epoch()
 
@@ -213,12 +214,12 @@ Examples:
 
 	# Go through some locales...
 
-	$date->Locale('french');
-	print "Time in french: ".$date."\n";
-	$date->Locale('deutsch');
-	print "Time in german: ".$date."\n";
-	$date->Locale('spanish');
-	print "Time in spanish: ".$date."\n";
+	$date->SetLocale('french');
+	print "Time in ".$date->Locale().": ".$date."\n";
+	$date->SetLocale('deutsch');
+	print "Time in ".$date->Locale().": ".$date."\n";
+	$date->SetLocale('spanish');
+	print "Time in ".$date->Locale().": ".$date."\n";
 
 	
 =head2 Operator overload special cases
@@ -406,12 +407,17 @@ Benoit Beausejour <bbeausej@pobox.com>
 
 =head1 CONTRIBUTORS
 
-Roland Rauch <roland@rauch.com>
+=over 3 
 
-Phillippe M. Chiasson <gozer@cpan.org>
+=item * Ron Savage <ron@savage.net.au>
 
-Patrick Bradley <peanut@burstofindifference.com>
+=item * Roland Rauch <roland@rauch.com>
 
+=item * Phillippe M. Chiasson <gozer@cpan.org>
+
+=item * Patrick Bradley <peanut@burstofindifference.com>
+
+=back
 
 =head1 SEE ALSO
 

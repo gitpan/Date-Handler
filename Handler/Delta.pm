@@ -56,6 +56,7 @@ sub new
 	}
 	elsif(!ref($delta))
 	{
+		$self->{months} = 0;
 		$self->{seconds} = $delta;
 	}
 	else

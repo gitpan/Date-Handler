@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 <TITLE>Date::Handler - Easy but complete date object</TITLE>
-<LINK REV="made" HREF="mailto:prospector@porky.devel.redhat.com">
+<LINK REV="made" HREF="mailto:root@uzi.opendesk.com">
 </HEAD>
 
 <BODY>
@@ -44,7 +44,7 @@
 <HR>
 <P>
 <H1><A NAME="name">NAME</A></H1>
-<P>Date::Handler - Easy but complete date object (0.12)</P>
+<P>Date::Handler - Easy but complete date object (0.13)</P>
 <P>
 <HR>
 <H1><A NAME="synopsis">SYNOPSIS</A></H1>
@@ -81,6 +81,7 @@
    $date-&gt;Epoch($epoch)                 Seconds since epoch (GMT)
    $date-&gt;TimeZone()                    America/Montreal,EST,PST and so on
    $date-&gt;Locale()                      french, en_US, fr_FR, spanish and so on
+   $date-&gt;SetLocale(locale)             Set the locale to the argument, returns locale or undef.
    $date-&gt;LocaleRealName()              Current locale's real name on the system
    $date-&gt;TimeZoneName()                EST, PST and so on
    $date-&gt;LocalTime()                   localtime of the object's epoch 
@@ -215,7 +216,7 @@ These methods are detailed in the SYNOPSIS up above.</P>
 <UL>
 <LI><STRONG><A NAME="item_TimeZone">Changing the time_zone of the object using <CODE>TimeZone()</CODE></A></STRONG><BR>
 
-<LI><STRONG><A NAME="item_Locale">Changing the object's locale on the fly using <CODE>Locale()</CODE></A></STRONG><BR>
+<LI><STRONG><A NAME="item_SetLocale">Changing the object's locale on the fly using <CODE>SetLocale()</CODE></A></STRONG><BR>
 
 <LI><STRONG><A NAME="item_Epoch">Changing the internal date of the object using <CODE>Epoch()</CODE></A></STRONG><BR>
 
@@ -238,12 +239,12 @@ These methods are detailed in the SYNOPSIS up above.</P>
 <PRE>
         # Go through some locales...</PRE>
 <PRE>
-        $date-&gt;Locale('french');
-        print &quot;Time in french: &quot;.$date.&quot;\n&quot;;
-        $date-&gt;Locale('deutsch');
-        print &quot;Time in german: &quot;.$date.&quot;\n&quot;;
-        $date-&gt;Locale('spanish');
-        print &quot;Time in spanish: &quot;.$date.&quot;\n&quot;;</PRE>
+        $date-&gt;SetLocale('french');
+        print &quot;Time in &quot;.$date-&gt;Locale().&quot;: &quot;.$date.&quot;\n&quot;;
+        $date-&gt;SetLocale('deutsch');
+        print &quot;Time in &quot;.$date-&gt;Locale().&quot;: &quot;.$date.&quot;\n&quot;;
+        $date-&gt;SetLocale('spanish');
+        print &quot;Time in &quot;.$date-&gt;Locale().&quot;: &quot;.$date.&quot;\n&quot;;</PRE>
 <P></P>
 <PRE>
 
@@ -418,9 +419,16 @@ terms as Perl itself.</P>
 <P>
 <HR>
 <H1><A NAME="contributors">CONTRIBUTORS</A></H1>
-<P>Roland Rauch &lt;<A HREF="mailto:roland@rauch.com">roland@rauch.com</A>&gt;</P>
-<P>Phillippe M. Chiasson &lt;<A HREF="mailto:gozer@cpan.org">gozer@cpan.org</A>&gt;</P>
-<P>Patrick Bradley &lt;<A HREF="mailto:peanut@burstofindifference.com">peanut@burstofindifference.com</A>&gt;</P>
+<UL>
+<LI><STRONG><A NAME="item_Ron_Savage_%3Cron%40savage%2Enet%2Eau%3E">Ron Savage &lt;<A HREF="mailto:ron@savage.net.au">ron@savage.net.au</A>&gt;</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Roland_Rauch_%3Croland%40rauch%2Ecom%3E">Roland Rauch &lt;<A HREF="mailto:roland@rauch.com">roland@rauch.com</A>&gt;</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Phillippe_M%2E_Chiasson_%3Cgozer%40cpan%2Eorg%3E">Phillippe M. Chiasson &lt;<A HREF="mailto:gozer@cpan.org">gozer@cpan.org</A>&gt;</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Patrick_Bradley_%3Cpeanut%40burstofindifference%2E">Patrick Bradley &lt;<A HREF="mailto:peanut@burstofindifference.com">peanut@burstofindifference.com</A>&gt;</A></STRONG><BR>
+
+</UL>
 <P>
 <HR>
 <H1><A NAME="see also">SEE ALSO</A></H1>

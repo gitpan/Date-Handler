@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -55,9 +55,22 @@ sub new
 
 	my $timezone = $args->{time_zone} || $self->DEFAULT_TIMEZONE();
 	$self->TimeZone($timezone);
-	
-	my $locale = $args->{locale} || $self->DEFAULT_LOCALE();
-	$self->Locale($locale);
+
+	if(defined $args->{locale})
+	{
+		$self->SetLocale($args->{locale}) || $self->SetLocale($self->DEFAULT_LOCALE());
+	}
+	else
+	{
+		$self->SetLocale($self->DEFAULT_LOCALE());
+	}
+
+	if(not defined $self->Locale())
+	{
+		warn "Impossible to set locale OR default locale correctly. Defaulting to GMT/UTC.";
+		$self->SetLocale('GMT');
+	}
+
 
 	if(ref($date) =~ /SCALAR/)
 	{
@@ -142,25 +155,36 @@ sub Locale
 
 	if(@_)
 	{
-		my $locale = shift;
+		warn "Calling Locale() with an argument to set the locale is deprecated. Please use SetLocale(locale) instead.\n";
 
-		my $locale_return = POSIX::setlocale(&POSIX::LC_TIME, $locale);
-
-		if( defined $locale_return )
-		{
-			$self->{locale} = $locale;
-			$self->{locale_realname} = $locale_return;
-		}
-		else
-		{
-
-			print STDERR "Locale $locale does not seem to be implemented on this system, keeping locale ".$self->{locale}."\n";
-		}
+		return $self->SetLocale(@_); 
 	}
 
-	return $self->{locale} || $self->DEFAULT_LOCALE();
+	return $self->{locale};
 }
 
+sub SetLocale
+{
+	my $self = shift;
+	my $locale = shift;
+
+	croak "No locale passed to SetLocale()" if not defined $locale;
+
+	my $locale_return = POSIX::setlocale(&POSIX::LC_TIME, $locale);
+
+	if( defined $locale_return )
+	{
+		$self->{locale} = $locale;
+		$self->{locale_realname} = $locale_return;
+
+		return $self->{locale};
+	}
+
+	print STDERR "Locale $locale does not seem to be implemented on this system, keeping locale ".$self->{locale}."\n";
+	return undef;
+}
+
+	
 sub LocaleRealName
 {
 	my $self = shift;
@@ -428,7 +452,7 @@ sub Array2Epoch
 
 #Oveload methods.
 
-sub AsScalar { return shift->TimeFormat(); }
+sub AsScalar { return shift->TimeFormat(shift); }
 sub AsNumber { return shift->{epoch}; }
 
 sub AsArray

@@ -1,5 +1,5 @@
 NAME
-    Date::Handler - Easy but complete date object (0.12)
+    Date::Handler - Easy but complete date object (0.13)
 
 SYNOPSIS
       use Date::Handler;
@@ -32,6 +32,7 @@ SYNOPSIS
        $date->Epoch($epoch)                 Seconds since epoch (GMT)
        $date->TimeZone()                    America/Montreal,EST,PST and so on
        $date->Locale()                      french, en_US, fr_FR, spanish and so on
+       $date->SetLocale(locale)             Set the locale to the argument, returns locale or undef.
        $date->LocaleRealName()              Current locale's real name on the system
        $date->TimeZoneName()                EST, PST and so on
        $date->LocalTime()                   localtime of the object's epoch 
@@ -167,7 +168,7 @@ IMPLEMENTATION
     A created Date::Handler can be modified on the fly by many ways:
 
     * Changing the time_zone of the object using TimeZone()
-    * Changing the object's locale on the fly using Locale()
+    * Changing the object's locale on the fly using SetLocale()
     * Changing the internal date of the object using Epoch()
     * By using operators in combination with Date::Handler::Delta objects
     Examples:
@@ -186,12 +187,12 @@ IMPLEMENTATION
 
             # Go through some locales...
 
-            $date->Locale('french');
-            print "Time in french: ".$date."\n";
-            $date->Locale('deutsch');
-            print "Time in german: ".$date."\n";
-            $date->Locale('spanish');
-            print "Time in spanish: ".$date."\n";
+            $date->SetLocale('french');
+            print "Time in ".$date->Locale().": ".$date."\n";
+            $date->SetLocale('deutsch');
+            print "Time in ".$date->Locale().": ".$date."\n";
+            $date->SetLocale('spanish');
+            print "Time in ".$date->Locale().": ".$date."\n";
 
   Operator overload special cases
 
@@ -376,12 +377,10 @@ AUTHOR
     Benoit Beausejour <bbeausej@pobox.com>
 
 CONTRIBUTORS
-    Roland Rauch <roland@rauch.com>
-
-    Phillippe M. Chiasson <gozer@cpan.org>
-
-    Patrick Bradley <peanut@burstofindifference.com>
-
+    * Ron Savage <ron@savage.net.au>
+    * Roland Rauch <roland@rauch.com>
+    * Phillippe M. Chiasson <gozer@cpan.org>
+    * Patrick Bradley <peanut@burstofindifference.com>
 SEE ALSO
     Class::Date(1). Time::Object(1). Date::Calc(1). perl(1).
 

@@ -6,7 +6,7 @@ use Exporter;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.7 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.8 $ =~ /: (\d+).(\d+)/;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(LoadTestConfig SkipTest);
@@ -1075,12 +1075,12 @@ sub locale
 
 	my $day_english = $date->WeekDayName();
 	
-	$date->Locale('french');
+	$date->SetLocale('french');
 
 	my $day_french = $date->WeekDayName();
 	ok(lc $day_french, lc "Mercredi");
 
-	$date->Locale('spanish');
+	$date->SetLocale('spanish');
 	
 	my $day_spanish = $date->WeekDayName();
 

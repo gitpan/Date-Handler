@@ -1,7 +1,21 @@
 Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
-0.22 Oct 23 2001
+0.13 Jan 10 2002
+	- AsScalar() can now take an optionnal format argument. (i.e. Timeformat)
+	(Thanks to Ron Savage <ron@savage.net.au> for the spot)
+	
+	- Fixed problems with Delta and date differences causing the months
+          data member to be empty and preventing concatenation.
+	(Thanks to Ron Savage <ron@savage.net.au> for the spot)
+
+	- Fixed problems with locale and the new() constructor
+	(Thanks to Ron Savage <ron@savage.net.au> for the spot)
+		. Locale() is now only used to get the current locale for an object, 
+	  	. Locale() will now warn if attempt to set the locale with Locale(locale) is detected.
+		. SetLocale() is now used to set the locale instead of Locale()
+	
+0.12 Oct 23 2001
 	- Fixed a stupid precedence bug in IsLeapYear()
 
 0.11 Oct 18 2001
