@@ -1,6 +1,6 @@
 =head1 NAME
 
-Date::Handler - Easy but complete date object (0.18)
+Date::Handler - Easy but complete date object (1.0)
 
 =head1 SYNOPSIS
 
@@ -501,6 +501,8 @@ Benoit Beausejour <bbeausej@pobox.com>
 =item * Ron Savage <ron@savage.net.au>
 
 =item * Roland Rauch <roland@rauch.com>
+
+=item * Patrick Bradley <peanut@bustofindifference.com>
 
 =item * Phillippe M. Chiasson <gozer@cpan.org>
 

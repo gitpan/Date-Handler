@@ -5,7 +5,7 @@ use strict;
 use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
-$VERSION = '0.09';
+$VERSION = '1.0';
 
 use POSIX qw(floor strftime mktime);
 
@@ -92,7 +92,7 @@ sub AsHash
 
 	return {
 				month => $self->Months(),
-				day => $self->Seconds(),
+				seconds => $self->Seconds(),
 		};
 }
 

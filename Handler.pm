@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.19';
+$VERSION = '1.0';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -78,7 +78,10 @@ sub new
 
 	if(ref($date) =~ /SCALAR/)
 	{
-		$self->{epoch} = $date;
+		if($date !~ /\s/ && $date !~ /[A-Za-z]/)
+		{
+			$self->{epoch} = $date;
+		}
 	}
 	elsif(ref($date) =~ /ARRAY/)
 	{
@@ -97,7 +100,10 @@ sub new
 	}
 	else
 	{
-		$self->{epoch} = $date;
+		if($date !~ /\s/ && $date !~ /[A-Za-z]/)
+		{
+			$self->{epoch} = $date;
+		}
 	}
 
 	$self->{_intuitive_day} = $args->{intuitive_day} if($self->INTUITIVE_MONTH_CALCULATIONS());

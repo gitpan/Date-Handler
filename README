@@ -1,5 +1,5 @@
 NAME
-    Date::Handler - Easy but complete date object (0.18)
+    Date::Handler - Easy but complete date object (1.0)
 
 SYNOPSIS
       use Date::Handler;
@@ -477,6 +477,7 @@ CONTRIBUTORS
     * Ethan Joffe <ethan@namimedia.com>
     * Ron Savage <ron@savage.net.au>
     * Roland Rauch <roland@rauch.com>
+    * Patrick Bradley <peanut@bustofindifference.com>
     * Phillippe M. Chiasson <gozer@cpan.org>
     * Jamie Letual <jamie@letual.net>
 SEE ALSO

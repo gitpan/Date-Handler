@@ -1,5 +1,10 @@
-Revision history for Perl extension Date::handler.
+Revision history for Perl extension Date::Handler.
 Maintained by <bbeausej@pobox.com>
+
+1.0  Sep 20 2002
+	- Version bump to 1.0!
+ 	- Added string checks for epoch format in constructor.
+	- Delta now represents itself in months and second in AsHash()
 
 0.19 Mar 26 2002
 	- Fixed problems with intuitive_hour being passed causing a one hour delayed date.

@@ -9,7 +9,7 @@ use Date::Handler;
 use Date::Handler::Delta;
 
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '1.0';
 
 sub new
 {
