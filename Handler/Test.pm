@@ -4,7 +4,7 @@ use strict;
 use Carp;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.4 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.5 $ =~ /: (\d+).(\d+)/;
 
 use Test;
 use Date::Handler;
@@ -1061,7 +1061,29 @@ sub extended_range
 		
 }
 	
-		
+
+sub extended_locale
+{
+	plan tests => 2;
+
+	my $date = Date::Handler->new({ date => [2001,8,29,1,0,0], time_zone => 'America/Montreal' });
+
+	my $day_english = $date->WeekDayName();
+	
+	$date->Locale('french');
+
+	my $day_french = $date->WeekDayName();
+	ok(lc $day_french, lc "Mercredi");
+
+	$date->Locale('spanish');
+	
+	my $day_spanish = $date->WeekDayName();
+
+	ok(lc $day_spanish, lc "miércoles");
+}
+
+
+	
 __END__
 
 1;	

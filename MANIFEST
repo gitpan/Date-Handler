@@ -11,7 +11,8 @@ Handler/Delta.pm
 Handler/Constants.pm
 Handler/Range.pm
 Handler/Test.pm
-t/0basic.t
-t/1ext.t
-t/2ext.t
-t/3ext.t
+t/0compiles.t
+t/1handles.t
+t/2deltas.t
+t/3ranges.t
+t/4locale.t

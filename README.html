@@ -20,10 +20,10 @@
 		<LI><A HREF="#creating the absolute date::handler">Creating the absolute Date::Handler</A></LI>
 		<LI><A HREF="#accessors">Accessors</A></LI>
 		<LI><A HREF="#modifying the object">Modifying the object</A></LI>
-		<LI><A HREF="#operator overload special cases">Operator overload special cases</A></LI>
 	</UL>
 
 	<LI><A HREF="#inheritance">INHERITANCE</A></LI>
+	<LI><A HREF="#notes on time zones, localisation and formatting">NOTES ON TIME ZONES, LOCALISATION AND FORMATTING</A></LI>
 	<LI><A HREF="#other date::handler modules">OTHER DATE::HANDLER MODULES</A></LI>
 	<UL>
 
@@ -44,7 +44,7 @@
 <HR>
 <P>
 <H1><A NAME="name">NAME</A></H1>
-<P>Date::Handler - Easy Date Object</P>
+<P>Date::Handler - Easy Date Object (0.09)</P>
 <P>
 <HR>
 <H1><A NAME="synopsis">SYNOPSIS</A></H1>
@@ -53,7 +53,7 @@
 </PRE>
 <PRE>
 
-  my $date = new Date::Handler({ date =&gt; time, time_zone =&gt; 'Europe/Paris', });
+  my $date = new Date::Handler({ date =&gt; time, time_zone =&gt; 'Europe/Paris', locale =&gt; 'french'});
   my $date = new Date::Handler({ date =&gt; [2001,04,12,03,01,55], time_zone =&gt; 'EST', });
   my $date = new Date::Handler({ date =&gt; {
                                                 year =&gt; 2001,
@@ -62,7 +62,10 @@
                                                 hour =&gt; 3,
                                                 min =&gt; 1,
                                                 sec =&gt; 55,
-                                        }, time_zone =&gt; 'America/Montreal', });</PRE>
+                                        }, 
+                                        time_zone =&gt; 'America/Los_Angeles', 
+                                        locale =&gt; 'en_US', 
+                                });</PRE>
 <PRE>
    print $date;
    print &quot;$date&quot;;
@@ -76,8 +79,9 @@
    $date-&gt;Min()                         0..59
    $date-&gt;Sec()                         0..59
    $date-&gt;Epoch($epoch)                 Seconds since epoch (GMT)
-   $date-&gt;TimeZone()                    America/Montreal
-   $date-&gt;TimeZoneName()                EST
+   $date-&gt;TimeZone()                    America/Montreal,EST,PST and so on
+   $date-&gt;Locale()                      french, en_US, fr_FR, spanish and so on
+   $date-&gt;TimeZoneName()                EST, PST and so on
    $date-&gt;LocalTime()                   localtime of the object's epoch 
    $date-&gt;TimeFormat($format_string)    strftime
    $date-&gt;GmtTime()                     gmtime of object's epoch
@@ -153,7 +157,8 @@
 from Timezone to Timezone and format itself. This module idea comes from an original version
 written by dLux (Szabó, Balázs) &lt;<A HREF="mailto:dlux@kapu.hu">dlux@kapu.hu</A>&gt; in his module Class::Date.</P>
 <P>Date::Handler is implemented in pure Perl using POSIX modules, it encapsulates the environnement variable
-TZ for it's time zone management so you don't have to play with it externally in the implementation.</P>
+TZ for it's time zone management so you don't have to play with it externally in the implementation. Date::Handler
+also supports localisation using POSIX where available.</P>
 <P>It uses operator overloading and Delta date objects to calculates time differences.</P>
 <P>This code is still in it's alpha <CODE>stage(v0.05)</CODE> and should not be used on production systems without
 reviewing the actual test cases provided with this module in the Date::Handler::Test package.</P>
@@ -167,7 +172,13 @@ reviewing the actual test cases provided with this module in the Date::Handler::
 <PRE>
         my $date = new Date::Handler({
                                 date =&gt; time,
-                                time_zone =&gt; 'Asia/Hong_Kong',
+                                time_zone =&gt; Japan',
+                        });</PRE>
+<PRE>
+        my $date = new Date::Handler({
+                                date =&gt; time(),
+                                time_zone =&gt; 'America/Los_Angeles',
+                                locale =&gt; 'spanish',
                         });</PRE>
 <P>The 'date' key of this argument can be either:</P>
 <UL>
@@ -193,7 +204,8 @@ reviewing the actual test cases provided with this module in the Date::Handler::
 <LI><STRONG><A NAME="item_sec_%2D_The_number_of_seconds_after_the_minute%2C_">sec	-	The number of seconds after the minute, normally in the range 0 to 59.</A></STRONG><BR>
 
 </UL>
-<P>The 'time_zone' key represents the time zone name this date is considered in.  i.e. Africa/Dakar, EST, PST, EDT</P>
+<P>The optional 'time_zone' key represents the time zone name this date is considered in.  i.e. Africa/Dakar, EST, PST, EDT</P>
+<P>The optional 'locale' key represents the locale used to represent this date. i.e. spanish, japananese, de_DE , fr_FR</P>
 <P>
 <H2><A NAME="accessors">Accessors</A></H2>
 <P>You can access the data inside the object using any of the provided methods.
@@ -204,14 +216,19 @@ These methods are detailed in the SYNOPSIS up above.</P>
 <UL>
 <LI><STRONG><A NAME="item_TimeZone">Changing the time_zone of the object using <CODE>TimeZone()</CODE></A></STRONG><BR>
 
+<LI><STRONG><A NAME="item_Locale">Changing the object's locale on the fly using <CODE>Locale()</CODE></A></STRONG><BR>
+
 <LI><STRONG><A NAME="item_Epoch">Changing the internal date of the object using <CODE>Epoch()</CODE></A></STRONG><BR>
 
 <LI><STRONG><A NAME="item_By_using_operators_in_combination_with_Date%3A%3AH">By using operators in combination with Date::Handler::Delta objects</A></STRONG><BR>
 
 </UL>
-<P>Example:</P>
+<P>Examples:</P>
 <PRE>
-        my $date = new Date::Handler({ date =&gt; time });
+        #Start off with a basic object for NOW. 
+        my $date = new Date::Handler({ date =&gt; time });</PRE>
+<PRE>
+        #Go through the time zones...
         $date-&gt;TimeZone('Asia/Tokyo');
         print &quot;Time in tokyo: &quot;.$date-&gt;LocalTime().&quot;\n&quot;;
         $date-&gt;Epoch(time);
@@ -219,8 +236,19 @@ These methods are detailed in the SYNOPSIS up above.</P>
         print &quot;Time in Montreal: &quot;.$date-&gt;LocalTime().&quot;\n&quot;;
         $date-&gt;TimeZone('GMT');
         print &quot;Greenwich Mean Time: &quot;.$date-&gt;LocalTime().&quot;\n&quot;;</PRE>
-<P>
-<H2><A NAME="operator overload special cases">Operator overload special cases</A></H2>
+<PRE>
+        # Go through some locales...</PRE>
+<PRE>
+        $date-&gt;Locale('french');
+        print &quot;Time in french: &quot;.$date.&quot;\n&quot;;
+        $date-&gt;Locale('deutsch');
+        print &quot;Time in german: &quot;.$date.&quot;\n&quot;;
+        $date-&gt;Locale('spanish');
+        print &quot;Time in spanish: &quot;.$date.&quot;\n&quot;;</PRE>
+<P></P>
+<PRE>
+
+=head2 Operator overload special cases</PRE>
 <P>The Date::Handler overloaded operator have special cases. Refer to the
 SYNOPSIS to get a description of each overloaded operator's behaviour.</P>
 <P>One special case of the overload is when adding an integer 'n' to a Date::Handler's reference. This is treated as if 'n' was in seconds. Same thing for substraction.</P>
@@ -276,7 +304,8 @@ timezone different than the machine's timezone.</P>
         @ISA = qw(Date::Handler);</PRE>
 <PRE>
 
-        use constant DEFAULT_TIMEZONE =&gt; 'Europe/Moscow';</PRE>
+        use constant DEFAULT_TIMEZONE =&gt; 'Europe/Moscow';
+        use consant DEFAULT_LOCALE =&gt; 'russian';</PRE>
 <PRE>
 
         sub TimeZone
@@ -287,7 +316,7 @@ timezone different than the machine's timezone.</P>
                 my $time_zone = $self-&gt;SUPER::TimeZone(@_);</PRE>
 <PRE>
 
-                return $time_zoneif defined $time_zone;</PRE>
+                return $time_zone if defined $time_zone;</PRE>
 <PRE>
 
                 return $self-&gt;DEFAULT_TIMEZONE();
@@ -296,6 +325,21 @@ timezone different than the machine's timezone.</P>
 
         1;
         __END__</PRE>
+<P>
+<HR>
+<H1><A NAME="notes on time zones, localisation and formatting">NOTES ON TIME ZONES, LOCALISATION AND FORMATTING</A></H1>
+<P>Date::Handler supports locales using POSIX <CODE>setlocale()</CODE> functions. The allowed values for the locale
+are listed (on most unix system) using the `locale -a` command. The Date::Handler defaults to ``en_US'' for
+it's locale when no locale are passed to the constructor. The constant DEFAULT_LOCALE can be overloaded
+to change this behaviour.</P>
+<P>Date::Handler supports time zones using POSIX <CODE>tzset()</CODE> and <CODE>tzname()</CODE> functions. The allowed values for the
+time_zone key are listed (on linux systems) by look at the /usr/share/zoneinfo directory. The Date::Handler
+default to ``GMT'' for it's time zone when to time_zone key are passed to the constructor. The constant DEFAULT_TIME_ZONE
+can be overloaded to change this behaviour.</P>
+<P>Date::Handler's formatting is provided by POSIX's <CODE>strfmtime()</CODE> function. The allowed parameters to the <CODE>TimeFormat()</CODE>
+method can be listed (on most unix system) using `man strftime`. By default, Date::Handler uses the format
+string '%c' to represent itself in most cases. The constant DEFAULT_FORMAT_STRING can be overloaded to change
+this behaviour.</P>
 <P>
 <HR>
 <H1><A NAME="other date::handler modules">OTHER DATE::HANDLER MODULES</A></H1>
@@ -373,9 +417,9 @@ terms as Perl itself.</P>
 <P>
 <HR>
 <H1><A NAME="contributors">CONTRIBUTORS</A></H1>
-<P>Roland Rauch &lt;<A HREF="mailto:roland@rauch.com">roland@rauch.com</A>&gt;
-Phillippe M. Chiasson &lt;<A HREF="mailto:gozer@cpan.org">gozer@cpan.org</A>&gt;
-Patrick Bradley &lt;peanut@burstofindifference&gt;</P>
+<P>Roland Rauch &lt;<A HREF="mailto:roland@rauch.com">roland@rauch.com</A>&gt;</P>
+<P>Phillippe M. Chiasson &lt;<A HREF="mailto:gozer@cpan.org">gozer@cpan.org</A>&gt;</P>
+<P>Patrick Bradley &lt;<A HREF="mailto:peanut@burstofindifference.com">peanut@burstofindifference.com</A>&gt;</P>
 <P>
 <HR>
 <H1><A NAME="see also">SEE ALSO</A></H1>

@@ -36,7 +36,7 @@ Maintained by <bbeausej@pobox.com>
 	- Some documentation update in Handler.pod
 	- Fixed a problem in Range objects when passing 'BACKWARDS' or 'FORWARDS' to the Direction() method.
 
-0.08 date TBA
+0.08 date Jul 15 2001 
 	- Fixed inheritance problem in Date::Handler::Add()
 	- Fixed inheritance problems in Date::Handler::Sub()
 	- Fixed inheritance problems in Date::Handler::Incr()
@@ -44,3 +44,8 @@ Maintained by <bbeausej@pobox.com>
 	- Fixed inheritance problems with Delta objects
 	- Now support for classic style argument passing in constructor, thanks to Roland Rauch <roland@rauch.com> for the spot
 	- Added contributors in Handler.pod.
+
+0.09 Aug 29 2001
+	- Implemented support for localisation using POSIX setlocale().
+	- Documentation update for localisation support
+	- Test cases name change to be more representative

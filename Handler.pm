@@ -6,13 +6,15 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
-use POSIX qw(floor strftime mktime);
+use POSIX qw(floor strftime mktime setlocale);
 
 use Date::Handler::Constants;
-use constant DEFAULT_FORMAT_STRING => "%A, %B %e %Y %R:%S (%Z)";
+use constant DEFAULT_FORMAT_STRING => '%c';
 use constant DEFAULT_TIMEZONE => 'GMT';
+use constant DEFAULT_LOCALE => 'en_US';
+
 use constant DELTA_CLASS => 'Date::Handler::Delta';
 
 use overload (
@@ -51,6 +53,7 @@ sub new
 
 	my $date = $args->{date};
 	$self->{time_zone} = $args->{time_zone} || $self->DEFAULT_TIMEZONE();
+	$self->{locale} = $args->{locale} || $self->DEFAULT_LOCALE();
 
 	if(ref($date) =~ /SCALAR/)
 	{
@@ -96,6 +99,7 @@ sub Month
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	return strftime('%m', localtime($self->{epoch}));
 }
@@ -128,6 +132,21 @@ sub TimeZone
 	return $self->{time_zone};
 }
 
+sub Locale
+{
+	my $self = shift;
+
+	if(@_)
+	{
+		my $locale = shift;
+
+		$self->{locale} = $locale;
+	}
+
+	setlocale(&POSIX::LC_TIME, $self->{locale});
+
+	return $self->{locale} || $self->DEFAULT_LOCALE();
+}
 
 #Time Conversion and info methods 
 
@@ -136,6 +155,7 @@ sub TimeZoneName
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	#Old code.
 	#my ($std,$dst) = POSIX::tzname();
@@ -149,6 +169,7 @@ sub LocalTime
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	return localtime($self->{epoch});
 }
@@ -160,8 +181,10 @@ sub TimeFormat
 	my $format_string = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
-
+	local $ENV{'LC_TIME'} = $self->Locale();
+		
 	$format_string ||= $self->DEFAULT_FORMAT_STRING(); 
+
 	return strftime($format_string, localtime($self->{epoch}));
 }
 
@@ -169,14 +192,20 @@ sub TimeFormat
 sub GmtTime
 {
 	my $self = shift;
+
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	return gmtime($self->{epoch});
 }
 
 sub UtcTime
 {
 	my $self = shift;
+
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	return gmtime($self->{epoch});
 }
 
@@ -189,6 +218,7 @@ sub GmtOffset
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	#Old code.
 	#use Time::Local;
@@ -211,6 +241,7 @@ sub MonthName
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	return strftime('%B', localtime($self->{epoch}));
 }
@@ -220,6 +251,7 @@ sub WeekDay
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	return strftime('%u', localtime($self->{epoch}));
 }
@@ -229,6 +261,7 @@ sub WeekDayName
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	return strftime('%A', localtime($self->{epoch}));
 }
@@ -238,6 +271,7 @@ sub FirstWeekDayOfMonth
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 		
 	return (($self->WeekDay() - $self->Day() % 7) + 8) % 7;
 }
@@ -247,6 +281,7 @@ sub WeekOfMonth
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	return int(($self->Day() + $self->FirstWeekDayOfMonth() - 1) / 7) + 1;
 }
@@ -257,6 +292,8 @@ sub DaysInMonth
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	my $month = $self->Month() - 1;
 
 	if($month == 1) #Feb
@@ -275,6 +312,7 @@ sub DayLightSavings
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
 	my @self_localtime = localtime($self->{epoch});
 
@@ -286,6 +324,7 @@ sub DayOfYear
 	my $self = shift;
 	
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 	
 	my @self_localtime = localtime($self->{epoch});
 
@@ -297,6 +336,8 @@ sub DaysInYear
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	return 365 if !$self->IsLeapYear();
 	return 366 if $self->IsLeapYear();
 }
@@ -306,6 +347,8 @@ sub DaysLeftInYear
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	my $days = $self->DaysInYear();
 	my $day = $self->DayOfYear();
 
@@ -317,6 +360,8 @@ sub LastDayOfMonth
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	if($self->Day() >= $self->DaysInMonth())
 	{
 		return 1;
@@ -329,6 +374,8 @@ sub IsLeapYear
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	my $year = $self->Year();
 
 	return 1 if(!($year % 400));
@@ -345,6 +392,8 @@ sub Array2Epoch
 	my ($y,$m,$d,$h,$mm,$ss) = @{$input}[0,1,2,3,4,5];
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 	return mktime(
 							$ss || 0, 
 							$mm || 0, 
@@ -368,6 +417,8 @@ sub AsArray
 	my $self = shift;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
+
 
 	my ($ss,$mm,$h,$d,$m,$y) = localtime($self->{epoch});
 	$y += 1900;
@@ -407,6 +458,8 @@ sub Add
 	elsif($delta->isa($self->DELTA_CLASS()))
 	{
 		local $ENV{'TZ'} = $self->TimeZone();
+		local $ENV{'LC_TIME'} = $self->Locale();
+
 
 		my $epoch = $self->{epoch};
 
@@ -525,10 +578,12 @@ sub AllInfo
 	my $out_string;
 
 	local $ENV{'TZ'} = $self->TimeZone();
+	local $ENV{'LC_TIME'} = $self->Locale();
 
-	$out_string .= $self->LocalTime()."\n";
-	$out_string .= $self->TimeFormat()."\n";
+	$out_string .= "LocalTime: ".$self->LocalTime()."\n";
+	$out_string .= "TimeFormat: ".$self->TimeFormat()."\n";
 	$out_string .= "Epoch: ".$self->Epoch()."\n";
+	$out_string .= "Locale: ".$self->Locale()."\n";
 	$out_string .= "TimeZone: ".$self->TimeZone()." (".$self->TimeZoneName().")\n";
 	$out_string .= "DayLightSavings: ".$self->DayLightSavings()."\n";
 	$out_string .= "GMT Time: ".$self->GmtTime()."\n";	
