@@ -1,6 +1,11 @@
 Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
+0.11 Oct 18 2001
+	- Fixed bug with constructor and unknown locales, now passing through Locale()
+	- Made the locale tests optionnal in make test since some systems don't have locales installed by default (OBSD)
+	- Added somes exported functions to Date::Handler::Test for further unification of test suite
+
 0.10 Sept 26 2001
 	- Implemented $date->LocaleRealName() from the return of setlocale()
 	- Calling $date->Locale() with an unknown locale will now warn the user.

@@ -1,3 +1,7 @@
 #!/usr/bin/perl
+use strict;
 use Date::Handler::Test;
-Date::Handler::Test::extended();
+
+my $test_config = LoadTestConfig();
+
+Date::Handler::Test::deltas();

@@ -120,9 +120,6 @@ also supports localisation using POSIX where available.
 
 It uses operator overloading and Delta date objects to calculates time differences.
 
-This code is still in it's alpha stage(v0.05) and should not be used on production systems without
-reviewing the actual test cases provided with this module in the Date::Handler::Test package.
-
 =head1 IMPLEMENTATION
 
 Using the Date::Handler is simple.

@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -52,8 +52,12 @@ sub new
 	croak "No date specified for new()" if not defined $args->{date};
 
 	my $date = $args->{date};
-	$self->{time_zone} = $args->{time_zone} || $self->DEFAULT_TIMEZONE();
-	$self->{locale} = $args->{locale} || $self->DEFAULT_LOCALE();
+
+	my $timezone = $args->{time_zone} || $self->DEFAULT_TIMEZONE();
+	$self->TimeZone($timezone);
+	
+	my $locale = $args->{locale} || $self->DEFAULT_LOCALE();
+	$self->Locale($locale);
 
 	if(ref($date) =~ /SCALAR/)
 	{

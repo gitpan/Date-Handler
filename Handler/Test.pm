@@ -2,9 +2,14 @@ package Date::Handler::Test;
 
 use strict;
 use Carp;
+use Exporter;
+
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.6 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.7 $ =~ /: (\d+).(\d+)/;
+
+@ISA = qw(Exporter);
+@EXPORT = qw(LoadTestConfig SkipTest);
 
 use Test;
 use Date::Handler;
@@ -1007,7 +1012,7 @@ perl(1).
 #1;
 
 
-sub extended
+sub deltas
 {
  	plan tests => 25;
 
@@ -1042,7 +1047,7 @@ sub extended
 	
 }	
 
-sub extended_range
+sub ranges
 {
 	plan tests => 4;
 	
@@ -1062,7 +1067,7 @@ sub extended_range
 }
 	
 
-sub extended_locale
+sub locale
 {
 	plan tests => 2;
 
@@ -1083,7 +1088,26 @@ sub extended_locale
 
 }
 
+sub SkipTest
+{
+	print "1..0\n";
+	exit;
+}
 
+sub LoadTestConfig
+{
+	my $config_str;
+
+	open(CONFIG, "t/config") || die "Cannot open t/config: $!";	
+	while(<CONFIG>) { $config_str .= $_; }
+	close CONFIG;
+
+	my $test_config = eval $config_str;
+
+	return $test_config;
+}
+
+	
 	
 __END__
 
