@@ -1,6 +1,6 @@
 =head1 NAME
 
-Date::Handler - Easy but complete date object (1.0)
+Date::Handler - Easy but complete date object (1.1)
 
 =head1 SYNOPSIS
 
@@ -455,17 +455,15 @@ If you find bugs with this module, do not hesitate to contact the author.
 Your comments and rants are welcomed :)
 
 
-=head1 CVS AND BLEEDING VERSIONS
+=head1 SUPPORT, CVS AND BLEEDING VERSIONS
 
-The latest developments and changes history for this module are available through cvsweb at:
+For the latest developments,changes files, history, CVS access and more, please visit:
 
-http://cvs.flatlineconstruct.com/
-
-The bleeding edge code is also available through anonymous CVS access via:
-
-cvs -d:pserver:anoncvs@cvs.flatlineconstruct.com:/home/cvs/anon checkout Date-Handler
+http://labs.turbulent.ca/
 
 Please, if you use this module in a project, let me know! 
+
+Commercial support for this module is available, please contact me for more info!
 
 =head1 TODO
 
@@ -496,8 +494,6 @@ Benoit Beausejour <bbeausej@pobox.com>
 
 =over 3 
 
-=item * Ethan Joffe <ethan@namimedia.com>
-
 =item * Ron Savage <ron@savage.net.au>
 
 =item * Roland Rauch <roland@rauch.com>
@@ -507,6 +503,10 @@ Benoit Beausejour <bbeausej@pobox.com>
 =item * Phillippe M. Chiasson <gozer@cpan.org>
 
 =item * Jamie Letual <jamie@letual.net>
+
+=item * Ethan Joffe <ethan@namimedia.com>
+
+=item * Mathew Robertson <mathew.robertson@redsheriff.com>
 
 =back
 

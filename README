@@ -1,5 +1,5 @@
 NAME
-    Date::Handler - Easy but complete date object (1.0)
+    Date::Handler - Easy but complete date object (1.1)
 
 SYNOPSIS
       use Date::Handler;
@@ -435,19 +435,16 @@ BUGS (known)
     If you find bugs with this module, do not hesitate to contact the
     author. Your comments and rants are welcomed :)
 
-CVS AND BLEEDING VERSIONS
-    The latest developments and changes history for this module are
-    available through cvsweb at:
+SUPPORT, CVS AND BLEEDING VERSIONS
+    For the latest developments,changes files, history, CVS access and more,
+    please visit:
 
-    http://cvs.flatlineconstruct.com/
-
-    The bleeding edge code is also available through anonymous CVS access
-    via:
-
-    cvs -d:pserver:anoncvs@cvs.flatlineconstruct.com:/home/cvs/anon checkout
-    Date-Handler
+    http://labs.turbulent.ca/
 
     Please, if you use this module in a project, let me know!
+
+    Commercial support for this module is available, please contact me for
+    more info!
 
 TODO
     Add support for dynamic locale using perllocales functions. This will
@@ -474,12 +471,13 @@ AUTHOR
     Benoit Beausejour <bbeausej@pobox.com>
 
 CONTRIBUTORS
-    * Ethan Joffe <ethan@namimedia.com>
     * Ron Savage <ron@savage.net.au>
     * Roland Rauch <roland@rauch.com>
     * Patrick Bradley <peanut@bustofindifference.com>
     * Phillippe M. Chiasson <gozer@cpan.org>
     * Jamie Letual <jamie@letual.net>
+    * Ethan Joffe <ethan@namimedia.com>
+    * Mathew Robertson <mathew.robertson@redsheriff.com>
 SEE ALSO
     Class::Date(1). Time::Object(1). Date::Calc(1). perl(1).
 

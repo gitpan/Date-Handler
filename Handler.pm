@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '1.0';
+$VERSION = '1.1';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -60,6 +60,7 @@ sub new
 	my $timezone = $args->{time_zone} || $self->DEFAULT_TIMEZONE();
 	$self->TimeZone($timezone);
 
+	$self->{locale} = "";
 	if(defined $args->{locale})
 	{
 		$self->SetLocale($args->{locale}) || $self->SetLocale($self->DEFAULT_LOCALE());
