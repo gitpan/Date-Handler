@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -495,14 +495,18 @@ sub Add
 	{
 		my $epoch = $self->Epoch();
 		$epoch += $delta;
-		$self->Epoch($epoch);
-		return $self;
+
+		my $newdate = ref($self)->new({ 
+			date => $epoch,
+			time_zone => $self->TimeZone(),
+		});
+
+		return $newdate;
 	}
 	elsif($delta->isa($self->DELTA_CLASS()))
 	{
 		local $ENV{'TZ'} = $self->TimeZone();
 		local $ENV{'LC_TIME'} = $self->Locale();
-
 
 		my $epoch = $self->{epoch};
 
@@ -512,18 +516,6 @@ sub Add
 		$epoch += $delta->Seconds();
 		$newdate->Epoch($epoch);
 
-		#Take care of day light savings border crossing
-		if(!$self->DayLightSavings() && $newdate->DayLightSavings())
-		{
-			$epoch -= 3600;
-			$newdate->Epoch($epoch);
-		}
-		elsif($self->DayLightSavings() && !$newdate->DayLightSavings())
-		{
-			$epoch += 3600;
-			$newdate->Epoch($epoch);
-		}
-		
 		my $self_array = $newdate->AsArray();
 		#Take care of the months.
 		$self_array->[1] += $delta->Months();
@@ -554,8 +546,13 @@ sub Sub
 	{
 		my $epoch = $self->Epoch();
 		$epoch -= $delta;
-		$self->Epoch($epoch);
-		return $self;
+
+ 		my $newdate = ref($self)->new({
+                        date => $epoch,
+                        time_zone => $self->TimeZone(),
+                });
+
+		return $newdate;
 	}
 	elsif($delta->isa($self->DELTA_CLASS()))
 	{

@@ -1,6 +1,11 @@
 Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
+0.15 Max 13 2002
+	- Reverted the fixes in version 0.14. POSIX does it's own day light compensation.
+	- Fixed a problem that caused the original reference of a date to be modified
+	when adding seconds to it.
+
 0.14 Mar 7 2002
 	- Fixed a bug that caused Date::Handler not to compensate when crossing
 	a day light savings border during the addition process. The fix will 

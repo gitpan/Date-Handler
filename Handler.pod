@@ -1,6 +1,6 @@
 =head1 NAME
 
-Date::Handler - Easy but complete date object (0.14)
+Date::Handler - Easy but complete date object (0.15)
 
 =head1 SYNOPSIS
 
