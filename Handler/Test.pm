@@ -6,7 +6,7 @@ use Exporter;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.8 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.9 $ =~ /: (\d+).(\d+)/;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(LoadTestConfig SkipTest);
@@ -1014,7 +1014,7 @@ perl(1).
 
 sub deltas
 {
- 	plan tests => 25;
+ 	plan tests => 27;
 
 	#1
 	my $date = Date::Handler->new({ date => [2001,11,25,00,00] });
@@ -1043,8 +1043,40 @@ sub deltas
 		ok($date - $delta, $cdate);
 	}
 
-		
-	
+	#Test daylight border crossing
+
+	my $enddate = Date::Handler->new({ date => [2002,4,9,0,0,0] , time_zone => "America/Los_Angeles" } );
+	my $cursample = Date::Handler->new({ date => [2002,4,6,0,0,0] , time_zone => "America/Los_Angeles" } );
+
+	my $sampledelta = Date::Handler::Delta->new([0,0,1,0,0,0]);
+
+
+	my $continue = 1;
+	$count = 0;
+
+	while($continue)
+	{
+		$count++;
+        	$cursample += $sampledelta;
+        	$continue = ($cursample <= $enddate);
+	}
+	ok($count,4);
+
+
+	$enddate = Date::Handler->new({ date => [2002,10,29,0,0,0], time_zone => 'America/Los_Angeles' });
+	$cursample = Date::Handler->new({ date => [2002,10,26,0,0,0], time_zone => 'America/Los_Angeles' });
+
+	$continue = 1;
+	$count = 0;	
+
+	while($continue)
+	{
+		$count++;
+	       	$cursample += $sampledelta;
+       		$continue = ($cursample <= $enddate);
+	}
+	ok($count, 4);
+
 }	
 
 sub ranges

@@ -1,6 +1,12 @@
 Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
+0.14 Mar 7 2002
+	- Fixed a bug that caused Date::Handler not to compensate when crossing
+	a day light savings border during the addition process. The fix will 
+	compensate the hour. 
+	(Thanks to Ethan Joffe <ethan@namimedia.com> for the spot)
+
 0.13 Jan 10 2002
 	- AsScalar() can now take an optionnal format argument. (i.e. Timeformat)
 	(Thanks to Ron Savage <ron@savage.net.au> for the spot)

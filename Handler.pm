@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -512,6 +512,18 @@ sub Add
 		$epoch += $delta->Seconds();
 		$newdate->Epoch($epoch);
 
+		#Take care of day light savings border crossing
+		if(!$self->DayLightSavings() && $newdate->DayLightSavings())
+		{
+			$epoch -= 3600;
+			$newdate->Epoch($epoch);
+		}
+		elsif($self->DayLightSavings() && !$newdate->DayLightSavings())
+		{
+			$epoch += 3600;
+			$newdate->Epoch($epoch);
+		}
+		
 		my $self_array = $newdate->AsArray();
 		#Take care of the months.
 		$self_array->[1] += $delta->Months();

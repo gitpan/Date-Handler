@@ -5,7 +5,7 @@ use strict;
 use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use POSIX qw(floor strftime mktime);
 
