@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+README
+README.html
+Makefile.PL
+Handler.pm
+Handler/Delta.pm
+Handler/Constants.pm
+Handler/Test.pm
+t/0basic.t
+t/1ext.t

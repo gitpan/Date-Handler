@@ -1,0 +1,384 @@
+<HTML>
+<HEAD>
+<TITLE>Date::Handler - Easy Date Object</TITLE>
+<LINK REV="made" HREF="mailto:root@porky.devel.redhat.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#IMPLEMENTATION">IMPLEMENTATION</A>
+	<UL>
+
+		<LI><A HREF="#Creating_the_absolute_Date_Hand">Creating the absolute Date::Handler</A>
+		<LI><A HREF="#Accessors">Accessors</A>
+		<LI><A HREF="#Modifying_the_object">Modifying the object</A>
+		<LI><A HREF="#Using_Date_Handler_Delta_objec">Using Date::Handler::Delta objects</A>
+		<LI><A HREF="#Operator_overload_special_cases">Operator overload special cases</A>
+	</UL>
+
+	<LI><A HREF="#INHERITANCE">INHERITANCE</A>
+	<LI><A HREF="#TODO">TODO</A>
+	<LI><A HREF="#COPYRIGHT">COPYRIGHT</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+Date::Handler - Easy Date Object
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>  use Date::Handler;
+ 
+  my $date = new Date::Handler({ date =&gt; time, time_zone =&gt; 'Europe/Paris', });
+  my $date = new Date::Handler({ date =&gt; [2001,04,12,03,01,55], time_zone =&gt; 'EST', });
+  my $date = new Date::Handler({ date =&gt; {
+                                                year =&gt; 2001,
+                                                month =&gt; 4,
+                                                day =&gt; 12,
+                                                hour =&gt; 3,
+                                                min =&gt; 1,
+                                                sec =&gt; 55,
+                                        }, time_zone =&gt; 'America/Montreal', });
+</PRE>
+<P>
+<PRE>   print $date;
+   print &quot;$date&quot;;
+   print $date-&gt;AllInfo();
+</PRE>
+<P>
+<PRE>   $date-&gt;new()                         Constructor
+   $date-&gt;Year()                        2001
+   $date-&gt;Month()                       0..11
+   $date-&gt;Day()                         1..31
+   $date-&gt;Hour()                        1..24
+   $date-&gt;Min()                         1..59
+   $date-&gt;Sec()                         1..59
+   $date-&gt;Epoch($epoch)                 Seconds since epoch (GMT)
+   $date-&gt;TimeZone()                    America/Montreal
+   $date-&gt;TimeZoneName()                EST
+   $date-&gt;LocalTime()                   localtime of the object's epoch 
+   $date-&gt;TimeFormat($format_string)    strftime
+   $date-&gt;GmtTime()                     gmtime of object's epoch
+   $date-&gt;UtcTime()                     same as GmtTime()
+   $date-&gt;GmtOffset()                   Offset of object's TZ in seconds
+   $date-&gt;MonthName()                   April
+   $date-&gt;WeekDay()                     1..7 (1 monday)
+   $date-&gt;WeekDayName()                 Wednesday
+   $date-&gt;FirstWeekDayOfMonth() 1..7
+   $date-&gt;WeekOfMonth()                 1..4
+   $date-&gt;DaysInMonth()                 31,30,29,28 depending on month and year.
+   $date-&gt;IsLeapYear()                  1 if true, 0 if false
+   $date-&gt;DayLightSavings()             1 if true, 0 if false
+   $date-&gt;DayOfYear()                   Return the day of the year
+   $date-&gt;DaysInYear()                  Returns the number of days in the year.
+   $date-&gt;DaysLeftInYear()              Returns the number of days remaining in the year
+   $date-&gt;Array2Epoch([])                       Transfer [y,m,d,h,mm,ss] to epoch time
+   $date-&gt;AsScalar ()                   Same as TimeFormat(&quot;%A, %B%e %Y %R (%Z)&quot;) 
+   $date-&gt;AsNumber()                    same as Epoch()
+   $date-&gt;AsArray()                     Returns [y,m,d,h,mm,ss]
+   $date-&gt;AsHash()                      Returns { year =&gt; y, month =&gt; m, day =&gt; d, hour =&gt; h, min =&gt; mm, sec =&gt; ss }
+   $date-&gt;AllInfo()                     Returns a string containing all of the Object's related information.
+   
+</PRE>
+<P>
+<PRE>   my $delta = new Date::Handler::Delta([3,1,10,2,5,5]);
+   my $delta = new Date::Handler::Delta({
+                                                years =&gt; 3,
+                                                months =&gt; 1,
+                                                days =&gt; 10,
+                                                hours =&gt; 2,
+                                                minutes =&gt; 5,
+                                                seconds =&gt; 5,
+                                        });
+   $delta-&gt;new
+   $delta-&gt;Months()                     Number of months in delta
+   $delta-&gt;Seconds()                    Number of seconds in delta
+   $delta-&gt;AsScalar()                   &quot;%d months and %d seconds&quot;
+   $delta-&gt;AsNumber()                   &quot;%d-%d-%d&quot;
+   $delta-&gt;AsArray()                    [y,m,ss]
+   $delta-&gt;AsHash()                     { months =&gt; m, seconds =&gt; ss }
+</PRE>
+<P>
+<PRE>   $date + $delta = Date::Handler
+   $date - $delta = Date::Handler
+   $date - $date2 = Date::Handler::Delta
+   $date + n = (+n seconds)
+   $date - n = (-n seconds)
+</PRE>
+<P>
+<PRE>   $delta + $delta = Date::Handler::Delta
+   $delta - $delta = Date::Handler::Delta
+   $delta * n = Date::Handler::Delta
+   $delta / n = Date::Handler::Delta
+   $delta + n = (+n seconds)
+   $delta - n = (-n seconds)
+</PRE>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+Date::Handler is a container for dates that holds all the methods to
+transform itself from Timezone to Timezone and format itself. This module
+idea comes from an original version written by dLux (Szabó, Balázs) &lt;<A
+HREF="mailto:dlux@kapu.hu">dlux@kapu.hu</A>&gt; in his module Class::Date.
+
+<P>
+Date::Handler is implemented in pure Perl using POSIX modules, it
+encapsulates the environnement variable TZ for it's time zone management so
+you don't have to play with it externally in the implementation.
+
+<P>
+It uses operator overloading and Delta date objects to calculates time
+differences.
+
+<P>
+This code is still in it's alpha <CODE>stage(v0.05)</CODE> and should not
+be used on production systems without reviewing the actual test cases
+provided with this module in the Date::Handler::Test package.
+
+<P>
+<HR>
+<H1><A NAME="IMPLEMENTATION">IMPLEMENTATION</A></H1>
+<P>
+Using the Date::Handler is simple.
+
+<P>
+<HR>
+<H2><A NAME="Creating_the_absolute_Date_Hand">Creating the absolute Date::Handler</A></H2>
+<P>
+The <CODE>new()</CODE> constructor receives only one argument as a hashref:
+
+<P>
+<PRE>        my $date = new Date::Handler({
+                                date =&gt; time,
+                                time_zone =&gt; 'Asia/Hong_Kong',
+                        });
+</PRE>
+<P>
+The 'date' key of this argument can be either:
+
+<UL>
+<LI><STRONG><A NAME="item_Epoch">Epoch time</A></STRONG>
+<LI><STRONG><A NAME="item_Anonymous">Anonymous array of the form: [y,m,d,h,mm,ss]</A></STRONG>
+<LI><STRONG><A NAME="item_A">A hashref of the form : { year =&gt; y,month =&gt; m, day =&gt; d, hour =&gt; h, min =&gt; mm, sec =&gt; ss }</A></STRONG>
+</UL>
+<P>
+The 'time_zone' key represents the time zone name this date is considered
+in. i.e. Africa/Dakar, EST, PST
+
+<P>
+<HR>
+<H2><A NAME="Accessors">Accessors</A></H2>
+<P>
+You can access the data inside the object using any of the provided
+methods. These methods are detailed in the SYNOPSIS up above.
+
+<P>
+<HR>
+<H2><A NAME="Modifying_the_object">Modifying the object</A></H2>
+<P>
+A created Date::Handler can be modified on the fly by many ways:
+
+<UL>
+<LI><STRONG><A NAME="item_Changing">Changing the time_zone of the object using TimeZone()</A></STRONG>
+<LI><STRONG><A NAME="item_Changing">Changing the internal date of the object using Epoch()</A></STRONG>
+<LI><STRONG><A NAME="item_By">By using operators in combination with Date::Handler::Delta objects</A></STRONG>
+</UL>
+<P>
+Example:
+
+<P>
+<PRE>        my $date = new Date::Handler({ date =&gt; time });
+        $date-&gt;TimeZone('Asia/Tokyo');
+        print &quot;Time in tokyo: &quot;.$date-&gt;LocalTime().&quot;\n&quot;;
+        $date-&gt;Epoch(time);
+        $date-&gt;TimeZone('America/Montreal');
+        print &quot;Time in Montreal: &quot;.$date-&gt;LocalTime().&quot;\n&quot;;
+        $date-&gt;TimeZone('GMT');
+        print &quot;Greenwich Mean Time: &quot;.$date-&gt;LocalTime().&quot;\n&quot;;
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Using_Date_Handler_Delta_objec">Using Date::Handler::Delta objects</A></H2>
+<P>
+To go forward or backward in time with a date object, you can use the
+Date::Handler::Delta objects. These objects represent a time lapse
+represented in months and seconds. Since Date::Handler uses operator
+overloading, you can 'apply' a Delta object on an absolute date simply by
+using '+' and '-'.
+
+<P>
+Example:
+
+<P>
+<PRE>        #A Delta of 1 year.
+        my $delta = new Date::Handler::Delta([1,0,0,0,0,0]);
+</PRE>
+<P>
+<PRE>        my $date = new Date::Handler({ date =&gt; time } );
+</PRE>
+<P>
+<PRE>        #$newdate is now one year in the furure.
+        my $newdate = $date+$delta;
+        
+        
+Refer to the Date::Handler::Delta(1) documentation for more on Deltas.
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Operator_overload_special_cases">Operator overload special cases</A></H2>
+<P>
+The Date::Handler overloaded operator have special cases. Refer to the
+SYNOPSIS to get a description of each overloaded operator's behaviour.
+
+<P>
+One special case of the overload is when adding an integer 'n' to a
+Date::Handler's reference. This is treated as if 'n' was in seconds. Same
+thing for substraction.
+
+<P>
+Example Uses of the overload:
+
+<P>
+<PRE>        my $date = new Date::Handler({ date =&gt;
+                                        {
+                                                year =&gt; 2001,
+                                                month =&gt; 5,
+                                                day =&gt; 14,
+                                                hour =&gt; 5,
+                                                min =&gt; 0,
+                                                sec =&gt; 0,
+                                        }});
+        #Quoted string overload 
+        print &quot;Current date is $date\n&quot;;
+        
+        my $delta = new Date::Handler::Delta({ days =&gt; 5, });
+        
+        #'+' overload, now, $date is 5 days in the future.      
+        $date += $delta;
+</PRE>
+<P>
+<PRE>        #Small clock. Not too accurate, but still ;)
+        while(1)
+        {
+                #Add one second to the date. (same as $date + 1)
+                $date++;
+                print &quot;$date\n&quot;;
+                sleep(1);
+        }
+</PRE>
+<P>
+<HR>
+<H1><A NAME="INHERITANCE">INHERITANCE</A></H1>
+<P>
+A useful way of using Date::Handler in your code is to implement that a
+class that ISA Date::Handler. This way you can overload methods through the
+inheritance tree and change the object's behaviour to your needs.
+
+<P>
+Here is a small example of an overloaded class that specifies a default
+timezone different than the machine's timezone.
+
+<P>
+<PRE>        #!/usr/bin/perl
+        package My::Date::Handler;
+        
+        use strict;
+        use vars qw(@ISA $VERSION);
+        
+        use Date::Handler;
+        @ISA = qw(Date::Handler);
+        
+        use constant DEFAULT_TIME_ZONE =&gt; 'Europe/Moscow';
+        
+        sub TimeZone
+        {
+                my ($self) = @_;
+        
+                my $time_zone = $self-&gt;SUPER::TimeZone(@_);
+        
+                return $time_zoneif defined $time_zone;
+        
+                return $self-&gt;DEFAULT_TIME_ZONE();
+        }       
+        
+        1;
+        __END__
+                
+=head1 BUGS (known)
+</PRE>
+<P>
+Dates after 2038 are not handled by this module yet. (POSIX)
+
+<P>
+Dates before 1902 are not handled by this module. (POSIX)
+
+<P>
+If you find bugs with this module, do not hesitate to contact the author.
+Your comments and rants are welcomed :)
+
+<P>
+<HR>
+<H1><A NAME="TODO">TODO</A></H1>
+<P>
+Add support for dynamic locale using perllocales functions. This will
+plugin directly with the use of strftime in the Date::Handler and provide
+locales.
+
+<P>
+Add a list of supported timezones in the Constants class.Just didnt around
+to do it yet :) Feel free :) If you have patches, recommendations or
+suggestions on this module, please come forward :)
+
+<P>
+<HR>
+<H1><A NAME="COPYRIGHT">COPYRIGHT</A></H1>
+<P>
+<CODE>Copyright(c)</CODE> 2001 Benoit Beausejour &lt;<A
+HREF="mailto:bbeausej@pobox.com">bbeausej@pobox.com</A>&gt;
+
+<P>
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself. 
+
+<P>
+Portions Copyright (c) Philippe M. Chiasson &lt;<A
+HREF="mailto:gozer@cpan.org">gozer@cpan.org</A>&gt;
+
+<P>
+Portions Copyright (c) Szabó, Balázs &lt;<A
+HREF="mailto:dlux@kapu.hu">dlux@kapu.hu</A>&gt;
+
+<P>
+Portions Copyright (c) Larry Rosler 
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Benoit Beausejour &lt;<A
+HREF="mailto:bbeausej@pobox.com">bbeausej@pobox.com</A>&gt;
+
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+Class::Date(1). Time::Object(1). Date::Calc(1). <CODE>perl(1).</CODE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,19 @@
+Revision history for Perl extension Date::Object.
+Maintained by <bbeausej@pobox.com>
+
+0.01  Wed Apr  4 23:42:48 2001
+	- original version; created by h2xs 1.20 with options
+		-n Date::Object
+
+0.02  Wed Apr 5 23:00:00 2001
+	- implemented most of the core features.
+	- Created the Delta object
+	- Abstraced the Constants class
+
+0.03  Wed Apr 6 12:00:00 2001
+	-Added documentation
+	-Fixed minor bugs	
+	-Change the format of Delta to months and seconds only.
+	-Fixed a bug when comparing 2 dates where one is dst the other std, it would return a missing hour.
+
+
