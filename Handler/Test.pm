@@ -4,11 +4,12 @@ use strict;
 use Carp;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.3 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.4 $ =~ /: (\d+).(\d+)/;
 
 use Test;
 use Date::Handler;
 use Date::Handler::Delta;
+use Date::Handler::Range;
 use Data::Dumper;
 
 sub basic 
@@ -1041,6 +1042,26 @@ sub extended
 	
 }	
 
+sub extended_range
+{
+	plan tests => 4;
+	
+	my $date = Date::Handler->new({ date => [2001,01,05,1,0,0], time_zone => 'America/Montreal' });
+	my $delta = Date::Handler::Delta->new([0,0,2,0,0,0]);
+
+	my $range = Date::Handler::Range->new({ date => $date, delta => $delta, });
+
+	ok($range->EndDate(),$date + $delta);
+	ok($range->StartDate(), $date);
+
+	$range->Direction('BACKWARDS');
+
+	ok($range->StartDate(),$date - $delta);
+	ok($range->EndDate(), $date);
+		
+}
+	
+		
 __END__
 
 1;	

@@ -9,7 +9,7 @@ use Date::Handler;
 use Date::Handler::Delta;
 
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 sub new
 {
@@ -74,11 +74,11 @@ sub Direction
 
 	if(defined $direction)
 	{
-		if($direction == 1 || $direction =~ /FORWARDS/i)
+		if($direction =~ /FORWARDS/i || $direction eq 1)
 		{
 			$self->{direction} = 1;
 		}
-		elsif($direction == 0 || $direction =~ /BACKWARDS/i)
+		elsif($direction =~ /BACKWARDS/i || $direction eq 0)
 		{
 			$self->{direction} = 0;
 		}
@@ -158,3 +158,101 @@ sub Overlaps
 
 666;
 __END__
+
+=head1 NAME
+
+Date::Handler::Range - Time range object 
+
+=head1 SYNOPSIS
+
+  use Date::Handler::Range;
+ 
+   my $range = new Date::Handler::Range( { date => $date, delta => $delta);
+
+   $range->new						Constructor	
+   $range->StartDate()					Returns a Date::Handler object of the range's start date.
+   $range->EndDate()					Returns a Date::Handler object of the range's end date.
+   $range->Overlaps($range2)				Returns true if $range overlaps $range2
+   $range->Direction('FORWARDS' || 'BACKWARDS') 	Sets the direction of the range	
+   $range->Delta()					Returns the delta contained by this range.
+   $range->Date()					Returns the date contained by this range.
+
+=head1 DESCRIPTION
+
+Range objects are used to specify moments in time between 2 dates. For the moment, this functionnality
+is very primitive but will evolve in future versions. Each range object is constructed by a base Date::Handler
+object. Then combined to that is a Date::Handler::Delta will specify the length of the range. Then thirdly, the
+range is given a direction, either 'FORWARDS' or 'BACKWARDS' in time. From these three values are calculated
+a start date and an end date.
+
+Example:
+
+	#Creation of the range starting now, ending in 2 days.
+	my $range = Date::Handler::Range->new({
+							date => time(),
+							delta => [0,0,2,0,0],
+	});
+
+	#This is already set to 'FORWARDS' by default.
+	$range->Direction('FORWARDS');
+
+	print "This range start ".$range->StartDate()." and ends ". $range->EndDate()."\n";
+
+	#Another range, starting at the end date of range 1, going backwards in time 7 days.
+	my $range2 = Date::Handler::Range->new({
+						date => $range->StartDate(),
+						delta => [0,0,7,0,0],
+						});
+
+	$range2->Direction('BACKWARDS');
+
+	#This returns true if range overlaps range2.
+	$range->Overlaps($range2);
+
+
+As I said earlier, the range functionnality is still very primitive, and the interface might change.
+Refer to Date::Handler::Range(1) for more information.
+
+
+=head1 BUGS (known)
+
+Deltas going after 2038 are not handled by this module yet. (POSIX)
+
+Deltas before 1902 are not handled by this module. (POSIX)
+
+If you find bugs with this module, do not hesitate to contact the author.
+Your comments and rants are welcomed :)
+
+=head1 TODO
+
+Implement overloading on ranges.
+Provide the value of the overlap in Overlaps()
+
+=head1 COPYRIGHT
+
+Copyright(c) 2001 Benoit Beausejour <bbeausej@pobox.com>
+
+All rights reserved. This program is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself. 
+
+Portions Copyright (c) Philippe M. Chiasson <gozer@cpan.org>
+
+Portions Copyright (c) Szabó, Balázs <dlux@kapu.hu>
+
+Portions Copyright (c) Larry Rosler 
+
+
+=head1 AUTHOR
+
+Benoit Beausejour <bbeausej@pobox.com>
+
+=head1 SEE ALSO
+
+Date::Handler(1).
+Date::Handler::Delta(1).
+Class::Date(1).
+Time::Object(1).
+Date::Calc(1).
+perl(1).
+
+=cut

@@ -20,12 +20,18 @@
 		<LI><A HREF="#creating the absolute date::handler">Creating the absolute Date::Handler</A></LI>
 		<LI><A HREF="#accessors">Accessors</A></LI>
 		<LI><A HREF="#modifying the object">Modifying the object</A></LI>
-		<LI><A HREF="#using date::handler::delta objects">Using Date::Handler::Delta objects</A></LI>
-		<LI><A HREF="#using date::handler::range objects">Using Date::Handler::Range objects</A></LI>
 		<LI><A HREF="#operator overload special cases">Operator overload special cases</A></LI>
 	</UL>
 
 	<LI><A HREF="#inheritance">INHERITANCE</A></LI>
+	<LI><A HREF="#other date::handler modules">OTHER DATE::HANDLER MODULES</A></LI>
+	<UL>
+
+		<LI><A HREF="#using date::handler::delta objects">Using Date::Handler::Delta objects</A></LI>
+		<LI><A HREF="#using date::handler::range objects">Using Date::Handler::Range objects</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs (known)">BUGS (known)</A></LI>
 	<LI><A HREF="#cvs and bleeding versions">CVS AND BLEEDING VERSIONS</A></LI>
 	<LI><A HREF="#todo">TODO</A></LI>
 	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
@@ -213,56 +219,6 @@ These methods are detailed in the SYNOPSIS up above.</P>
         $date-&gt;TimeZone('GMT');
         print &quot;Greenwich Mean Time: &quot;.$date-&gt;LocalTime().&quot;\n&quot;;</PRE>
 <P>
-<H2><A NAME="using date::handler::delta objects">Using Date::Handler::Delta objects</A></H2>
-<P>To go forward or backward in time with a date object, you can use
-the Date::Handler::Delta objects. These objects represent a time lapse
-represented in months and seconds. Since Date::Handler uses
-operator overloading, you can 'apply' a Delta object on an absolute date
-simply by using '+' and '-'.</P>
-<P>Example:</P>
-<PRE>
-        #A Delta of 1 year.
-        my $delta = new Date::Handler::Delta([1,0,0,0,0,0]);</PRE>
-<PRE>
-        my $date = new Date::Handler({ date =&gt; time } );</PRE>
-<PRE>
-        #$newdate is now one year in the furure.
-        my $newdate = $date+$delta;
-</PRE>
-<PRE>
-
-Refer to the Date::Handler::Delta(1) documentation for more on Deltas.</PRE>
-<P>
-<H2><A NAME="using date::handler::range objects">Using Date::Handler::Range objects</A></H2>
-<P>Range objects are used to specify moments in time between 2 dates. For the moment, this functionnality
-is very primitive but will evolve in future versions. Each range object is constructed by a base Date::Handler
-object. Then combined to that is a Date::Handler::Delta will specify the length of the range. Then thirdly, the
-range is given a direction, either 'FORWARDS' or 'BACKWARDS' in time. From these three values are calculated
-a start date and an end date.</P>
-<P>Example:</P>
-<PRE>
-        #Creation of the range starting now, ending in 2 days.
-        my $range = Date::Handler::Range-&gt;new({
-                                                        date =&gt; time(),
-                                                        delta =&gt; [0,0,2,0,0],
-                                                });</PRE>
-<PRE>
-        #This is already set to 'FORWARDS' by default.
-        $range-&gt;Direction('FORWARDS');</PRE>
-<PRE>
-        print &quot;This range start &quot;.$range-&gt;StartDate().&quot; and ends &quot;. $range-&gt;EndDate().&quot;\n&quot;;</PRE>
-<PRE>
-        #Another range, starting at the end date of range 1, going backwards in time 7 days.
-        my $range2 = Date::Handler::Range-&gt;new({
-                                                        date =&gt; $range-&gt;StartDate(),
-                                                        delta =&gt; [0,0,7,0,0],
-                                                });
-        $range2-&gt;Direction('BACKWARDS');</PRE>
-<PRE>
-        #This returns true if range overlaps range2.
-        $range-&gt;Overlaps($range2);</PRE>
-<P>As I said earlier, the range functionnality is still very primitive, and the interface might change.</P>
-<P>
 <H2><A NAME="operator overload special cases">Operator overload special cases</A></H2>
 <P>The Date::Handler overloaded operator have special cases. Refer to the
 SYNOPSIS to get a description of each overloaded operator's behaviour.</P>
@@ -339,9 +295,50 @@ timezone different than the machine's timezone.</P>
 
         1;
         __END__</PRE>
+<P>
+<HR>
+<H1><A NAME="other date::handler modules">OTHER DATE::HANDLER MODULES</A></H1>
+<P>Here is a brief description of the other modules in this package.</P>
+<P>
+<H2><A NAME="using date::handler::delta objects">Using Date::Handler::Delta objects</A></H2>
+<P>To go forward or backward in time with a date object, you can use
+the Date::Handler::Delta objects. These objects represent a time lapse
+represented in months and seconds. Since Date::Handler uses
+operator overloading, you can 'apply' a Delta object on an absolute date
+simply by using '+' and '-'.</P>
+<P>Example:</P>
+<PRE>
+        #A Delta of 1 year.
+        my $delta = new Date::Handler::Delta([1,0,0,0,0,0]);</PRE>
+<PRE>
+        my $date = new Date::Handler({ date =&gt; time } );</PRE>
+<PRE>
+        #$newdate is now one year in the furure.
+        my $newdate = $date+$delta;
+</PRE>
 <PRE>
 
-=head1 BUGS (known)</PRE>
+Refer to the Date::Handler::Delta(1) documentation for more on Deltas.</PRE>
+<P>
+<H2><A NAME="using date::handler::range objects">Using Date::Handler::Range objects</A></H2>
+<P>Range objects are used to define a time range using a start date and a delta object.
+Can be useful to calculate recurrences of events and event overlap.</P>
+<P>Example:
+</P>
+<PRE>
+
+        A simple range for an event of 3 days:</PRE>
+<PRE>
+        my $range = Date::Handler::Range-&gt;new({
+                                                        date =&gt; Date::Handler-&gt;new({ date =&gt; time() }),
+                                                        delta =&gt; Date::Handler::Delta-&gt;new([0,0,3,0,0,0]),
+                                                });</PRE>
+<PRE>
+        print &quot;This event starts on &quot;.$range-&gt;StartDate().&quot; and end on &quot;.$range-&gt;EndDate().&quot;\n&quot;;</PRE>
+<P>See perldoc Date::Handler::Range(1) for more information on how to use Date::Handler::Range objects.</P>
+<P>
+<HR>
+<H1><A NAME="bugs (known)">BUGS (known)</A></H1>
 <P>Dates after 2038 are not handled by this module yet. (POSIX)</P>
 <P>Dates before 1970 are not handled by this module. (POSIX)</P>
 <P>If you find bugs with this module, do not hesitate to contact the author.

@@ -29,3 +29,7 @@ Maintained by <bbeausej@pobox.com>
 	- Added a DEFAULT_TIMEZONE constant for when no tz is passed to the constructor.
 	- Moved documentation to Handler.pod
 	- Some documentation updates concerning the constructor
+0.07 Sun Jul 11 3:52PM 2001
+	- Moved Range documentation to Range.pm
+	- Some documentation update in Handler.pod
+	- Fixed a problem in Range objects when passing 'BACKWARDS' or 'FORWARDS' to the Direction() method.

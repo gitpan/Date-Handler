@@ -196,62 +196,6 @@ Example:
 	print "Greenwich Mean Time: ".$date->LocalTime()."\n";
 
 
-=head2 Using Date::Handler::Delta objects
-
-To go forward or backward in time with a date object, you can use
-the Date::Handler::Delta objects. These objects represent a time lapse
-represented in months and seconds. Since Date::Handler uses
-operator overloading, you can 'apply' a Delta object on an absolute date
-simply by using '+' and '-'.
-
-Example:
-
-	#A Delta of 1 year.
-	my $delta = new Date::Handler::Delta([1,0,0,0,0,0]);
-
-	my $date = new Date::Handler({ date => time } );
-
-	#$newdate is now one year in the furure.
-	my $newdate = $date+$delta;
-	
-	
-Refer to the Date::Handler::Delta(1) documentation for more on Deltas.
-
-
-=head2 Using Date::Handler::Range objects 
-
-Range objects are used to specify moments in time between 2 dates. For the moment, this functionnality
-is very primitive but will evolve in future versions. Each range object is constructed by a base Date::Handler
-object. Then combined to that is a Date::Handler::Delta will specify the length of the range. Then thirdly, the
-range is given a direction, either 'FORWARDS' or 'BACKWARDS' in time. From these three values are calculated
-a start date and an end date.
-
-Example:
-
-	#Creation of the range starting now, ending in 2 days.
-	my $range = Date::Handler::Range->new({
-							date => time(),
-							delta => [0,0,2,0,0],
-						});
-
-	#This is already set to 'FORWARDS' by default.
-	$range->Direction('FORWARDS');
-
-	print "This range start ".$range->StartDate()." and ends ". $range->EndDate()."\n";
-
-	#Another range, starting at the end date of range 1, going backwards in time 7 days.
-	my $range2 = Date::Handler::Range->new({
-							date => $range->StartDate(),
-							delta => [0,0,7,0,0],
-						});
-	$range2->Direction('BACKWARDS');
-
-	#This returns true if range overlaps range2.
-	$range->Overlaps($range2);
-
-
-As I said earlier, the range functionnality is still very primitive, and the interface might change. 
-
 =head2 Operator overload special cases
 
 The Date::Handler overloaded operator have special cases. Refer to the
@@ -290,9 +234,6 @@ Example Uses of the overload:
 
 
 
-
-
-
 =head1 INHERITANCE
 
 A useful way of using Date::Handler in your code is to implement that a class
@@ -326,7 +267,53 @@ timezone different than the machine's timezone.
 	
 	1;
 	__END__
+
+
+=head1 OTHER DATE::HANDLER MODULES
+
+Here is a brief description of the other modules in this package.
+
+=head2 Using Date::Handler::Delta objects
+
+To go forward or backward in time with a date object, you can use
+the Date::Handler::Delta objects. These objects represent a time lapse
+represented in months and seconds. Since Date::Handler uses
+operator overloading, you can 'apply' a Delta object on an absolute date
+simply by using '+' and '-'.
+
+Example:
+
+	#A Delta of 1 year.
+	my $delta = new Date::Handler::Delta([1,0,0,0,0,0]);
+
+	my $date = new Date::Handler({ date => time } );
+
+	#$newdate is now one year in the furure.
+	my $newdate = $date+$delta;
+	
+	
+Refer to the Date::Handler::Delta(1) documentation for more on Deltas.
+
+
+=head2 Using Date::Handler::Range objects 
+
+Range objects are used to define a time range using a start date and a delta object.
+Can be useful to calculate recurrences of events and event overlap.
+
+Example:
 		
+	A simple range for an event of 3 days:
+
+	my $range = Date::Handler::Range->new({
+							date => Date::Handler->new({ date => time() }),
+							delta => Date::Handler::Delta->new([0,0,3,0,0,0]),
+						});
+
+	print "This event starts on ".$range->StartDate()." and end on ".$range->EndDate()."\n";
+
+See perldoc Date::Handler::Range(1) for more information on how to use Date::Handler::Range objects. 
+
+
 =head1 BUGS (known)
 
 Dates after 2038 are not handled by this module yet. (POSIX)
