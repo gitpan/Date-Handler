@@ -6,7 +6,7 @@ use Exporter;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-$VERSION = sprintf '%d.%03d', q$Revision: 1.10 $ =~ /: (\d+).(\d+)/;
+$VERSION = sprintf '%d.%03d', q$Revision: 1.13 $ =~ /: (\d+).(\d+)/;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(LoadTestConfig SkipTest);
@@ -619,6 +619,7 @@ ok(1);
 }
 
 
+
 =head1 NAME
 
 Date::Handler::Test  - Test module for Date::Handler
@@ -1088,6 +1089,160 @@ sub locale
 
 }
 
+sub IntuitiveMonths
+{
+	plan tests => 8;
+
+
+	my $date = Date::Handler::Tester->new({ date => [2002,01,30,5,0,0], time_zone => 'America/Montreal', })
+	;
+	my $onemonth = Date::Handler::Delta->new([0,1,0,0,0,0]);
+	my $oneweek = Date::Handler::Delta->new([0,0,7,0,0,0]);
+
+	my $twomonths = Date::Handler::Delta->new([0,2,0,0,0,0]);
+
+	my $cdate1 = Date::Handler::Tester->new({
+					date => [2002,02,28,5,0,0], 
+					time_zone => 'America/Montreal',
+	});
+
+	my $cdate2 = Date::Handler::Tester->new({
+					date => [2002,03,30,5,0,0],
+					time_zone => 'America/Montreal',
+	});
+
+	my $cdate3 = Date::Handler::Tester->new({
+					date => [2002,03,31, 5,0,0],
+					time_zone => 'America/Montreal',
+	});
+
+	my $cdate4 = Date::Handler::Tester->new({
+					date => [2002,03,30, 5,0,0],
+					time_zone => 'America/Montreal',
+	});
+
+	ok( ($date + $onemonth), $cdate1);
+
+	ok( ($date + $onemonth) + $onemonth, $cdate2);
+
+	ok( ($date + (2 * $onemonth)), $cdate2);
+
+	ok( ($date + ($twomonths)), $cdate2);
+
+	
+	my $date2 = Date::Handler::Tester->new({ date => [2001,12,31,5,0,0], time_zone => 'America/Montreal',})
+	;
+
+	ok( ($date2 + $onemonth + $onemonth + $onemonth), $cdate3);
+	
+	my $date3 = Date::Handler::Tester->new({ date => [2002,02,28,5,0,0], time_zone => 'America/Montreal',
+	                        intuitive_day => 30,    });
+
+	ok( ($date3 + $onemonth), $cdate4);
+
+	my $date4 = Date::Handler::Tester->new({ date => [2000,1,1,6,0,0], time_zone => 'America/Montreal'});
+
+	for(1..24)
+	{
+		$date4 += $onemonth;
+	}
+	ok($date4, Date::Handler->new({ date => [2002,1,1,6,0,0], time_zone => 'America/Montreal'}));
+
+	for(1..8)
+	{
+		$date4 += $oneweek;
+	}
+	ok($date4, Date::Handler->new({date =>[2002,2,26,6,0,0], time_zone => 'America/Montreal'}));
+
+}
+
+sub StandardMonths
+{
+	plan tests => 5;
+
+
+	my $date = Date::Handler->new({ date => [2002,01,30,5,0,0], time_zone => 'America/Montreal', })
+	;
+	my $onemonth = Date::Handler::Delta->new([0,1,0,0,0,0]);
+	my $twomonths = Date::Handler::Delta->new([0,2,0,0,0,0]);
+
+	my $cdate1 = Date::Handler->new({
+					date => [2002,03,02,5,0,0], 
+					time_zone => 'America/Montreal',
+	});
+
+	my $cdate2 = Date::Handler->new({
+					date => [2002,04,03,5,0,0],
+					time_zone => 'America/Montreal',
+	});
+
+	my $cdate3 = Date::Handler->new({
+					date => [2002,04,02, 5,0,0],
+					time_zone => 'America/Montreal',
+	});
+
+	my $cdate4 = Date::Handler->new({
+					date => [2002,03,30, 5,0,0],
+					time_zone => 'America/Montreal',
+	});
+
+	ok( ($date + $onemonth), $cdate1);
+
+	ok( ($date + $onemonth) + $onemonth, $cdate3);
+
+	ok( ($date + (2 * $onemonth)), $cdate4);
+
+	ok( ($date + ($twomonths)), $cdate4);
+
+	
+	my $date2 = Date::Handler->new({ date => [2001,12,31,5,0,0], time_zone => 'America/Montreal',})
+	;
+
+
+	ok( ($date2 + $onemonth + $onemonth + $onemonth), $cdate2);
+	
+}
+
+
+sub IntuitiveDSTTime
+{
+	plan tests => 7;
+
+
+	my $date = Date::Handler::Tester->new({ date => [2002,04,06,1,0,0], time_zone => 'America/Montreal', });
+
+	my $oneday = Date::Handler::Delta->new([0,0,1,0,0,0]);
+
+	my $date1 = Date::Handler::Tester->new({ date => [2002,4,07,1,0,0], time_zone => 'America/Montreal', });
+
+	my $date2 = Date::Handler::Tester->new({ date => [2002,4,06,2,0,0], time_zone => 'America/Montreal', });
+
+	my $date3 = Date::Handler::Tester->new({ date => [2002,4,07,3,0,0], time_zone => 'America/Montreal', });
+
+	my $date4 = Date::Handler::Tester->new({ date => [2002,4,8,2,0,0], time_zone => 'America/Montreal', });
+
+	ok($date + $oneday, $date1);
+
+	ok($date2 + $oneday, $date3);
+
+	ok($date2 + $oneday + $oneday, $date4);
+
+	my $date5 = Date::Handler::Tester->new({ date => [2002,10,26,1,0,0], time_zone => 'America/Montreal',});
+	my $date6 = Date::Handler::Tester->new({ date => [2002,10,27,1,0,0], time_zone => 'America/Montreal', });
+	my $date7 = Date::Handler::Tester->new({ date => [2002,10,28,1,0,0], time_zone => 'America/Montreal', });
+	my $date8 = Date::Handler::Tester->new({ date => [2002,10,26,0,0,0], time_zone => 'America/Montreal', });
+	my $date9 = Date::Handler::Tester->new({ date => [2002,10,27,0,0,0], time_zone => 'America/Montreal', });
+	my $date10 = Date::Handler::Tester->new({ date => [2002,10,28,0,0,0], time_zone => 'America/Montreal', });
+
+	ok($date5 + $oneday, $date6);
+
+	ok($date5 + $oneday + $oneday, $date7);
+	
+	ok($date8 + $oneday, $date9);	
+	
+	ok($date8 + $oneday + $oneday, $date10);
+}
+	
 sub SkipTest
 {
 	print "1..0\n";
@@ -1107,8 +1262,17 @@ sub LoadTestConfig
 	return $test_config;
 }
 
-	
+1;
+
+package Date::Handler::Tester;
+
+use strict;
+use base qw(Date::Handler);
+
+use constant INTUITIVE_MONTH_CALCULATIONS => 1;
+use constant INTUITIVE_TIME_CALCULATIONS => 1;
+use constant INTUITIVE_DST_ADJUSTMENTS => 1;
+
+1;
 	
 __END__
-
-1;	

@@ -1,6 +1,6 @@
 =head1 NAME
 
-Date::Handler - Easy but complete date object (0.15)
+Date::Handler - Easy but complete date object (0.17)
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,9 @@ The optional 'time_zone' key represents the time zone name this date is consider
 
 The optional 'locale' key represents the locale used to represent this date. i.e. spanish, japananese, de_DE , fr_FR
 
+You can also pass an 'intuitive_day' key to the constructor. This is described in the
+"USING INTUITIVE MONTH CALCULATIONS" section.
+
 =head2 Accessors
 
 You can access the data inside the object using any of the provided methods.
@@ -294,6 +297,90 @@ timezone different than the machine's timezone.
 	
 	1;
 	__END__
+
+=head1 USING INTUITIVE MONTH CALCULATIONS (off by default)
+
+Date::Handler contains a feature by witch a date handler object can use intuitive
+month calculation. This means that Date::Handler will compensate for month
+overflows during delta operations.
+
+For example, if you have a date handler that is 2002/01/30, and you add to it a delta
+of 1 month, standard Date::Handler object will give you a new object that is 2002/03/02.
+This is because POSIX will compensate for the month overflow and add 2 days to the date
+because February does not have a 29 or 30th in 2002. Date::Handler can compensate for
+that by using the INTUITIVE_MONTH_CALCULATIONS constant. (this is turned off by default).
+
+This constant can be turned on during overloading (inheritance):
+
+	use constant INTUITIVE_MONTH_CALCULATIONS => 1;
+
+Turning this constant on will tell Date::Handler to follow track of month overflow during
+operations. This will make it so that adding a month to 2002/01/30 will bring you to 
+2002/02/28. Adding another month to this will bring you (with intuition) to 2002/03/30, 
+because Date::Handler keeps track of the "intuitive" day of the month.
+
+Using INTUITIVE_MONTH_CALCULATIONS will also make it possible to pass an "intuitive_day" 
+key to the new() constructor in order to simulate a previous addition.
+
+	i.e.
+		
+	my $date = Date::Handler->new({ 
+				date => [2002,02,28,1,0,0,0], 
+				time_zone => 'America/Montreal',
+				intuitive_day => '30',
+	});
+
+	my $onemonth = Date::Handler::Delta->new([0,1,0,0,0,0]);
+
+	print ($date + $onemonth)."\n";
+
+In this example, the start date of 2002/02/28 with intuitive_day set to 30 will make it
+so that adding 1 month to the date will bring us to march 30th. Note that INTUITIVE_MONTH_CALCULATIONS will only affect month/day calculations and no time modifications will be applied.
+
+=head1 USING INTUITIVE_DST_ADJUSTMENTS (off by default)
+
+Date::Handler provides a facility called INTUITIVE_DST_ADJUSTMENTS. This is implemented via an
+inherited constant, like the other options above. When INTUITIVE_DST_ADJUSTMENTS are turned on, 
+Date::Handler will compensate for day light savings changes. For example, 2002/04/07 1AM + 1 day
+would give you 2002/04/08 1AM instead of 2AM. Note that INTUITIVE_DST_ADJUSTMENTS will not apply
+this compensation when the exact "turn over" date/time is detected. For example, 2002/04/06 2AM
++ 1 day would give you 2002/04/07 3AM because we don't compensate for this specific case.
+
+=head1 USING INTUITIVE_TIME_CALCULATIONS (off by default)
+
+Date::Handler provides yet another facility to add intuitive date calculations. By using
+INTUITIVE_TIME_CALCULATIONS (via inherited constant), Date::Handler will "remember" that it
+compensated for a DST adjustment and try to compensate for it. 
+
+For example, 2002/04/06 2AM + 1day would give you 2002/04/07 3AM. Adding a day to this date
+under INTUITIVE_TIME_CALCULATIONS would give you 2002/04/08 2AM because Date::Handler remembers
+it compensated for day light savings.
+
+Combining INTUITIVE_DST_ADJUSTMENTS, INTUITIVE_MONTH_CALCULATIONS and INTUITIVE_TIME_CALCULATIONS
+will give a behaviour closer to the way humans expect the module to react.
+
+This can be very useful to make date calculations a little more "humanized".
+
+The intuitive "hour" can be faked by passing it to the new() constructor:
+
+	package MyDateHandler;
+
+	use strict;
+	use base qw(Date::Handler);
+
+	use constant INTUITIVE_DST_ADJUSTMENTS => 1;
+	use constant INTUITIVE_TIME_CALCULATIONS => 1;
+
+	1;
+
+
+then:
+
+	my $date = MyDateHandler->new({ 
+			date => [2002,04,08,5,0,0], 
+			time_zone => 'America/Montreal',
+			intuitive_hour => 2,
+	});
 
 =head1 NOTES ON TIME ZONES, LOCALISATION AND FORMATTING
 
@@ -417,7 +504,7 @@ Benoit Beausejour <bbeausej@pobox.com>
 
 =item * Phillippe M. Chiasson <gozer@cpan.org>
 
-=item * Patrick Bradley <peanut@burstofindifference.com>
+=item * Jamie Letual <jamie@letual.net>
 
 =back
 

@@ -1,7 +1,20 @@
 Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
-0.15 Max 13 2002
+0.18 Mar 21 2002
+	- Introduced INTUITIVE_TIME_CALCULATIONS()
+	- Introduced INTUITIVE_DST_ADJUSTMENT()
+	- Added intuition check when adding seconds directly to a date to follow constants.
+	
+0.17 Mar 20 2002
+	- Fixed bug with INTUITIVE_MONTH_CALCULATIONS where the month was caculated 0 based
+	when it's actually 1 based.
+
+0.16 Mar 15 2002
+	- Implemented INTUITIVE_MONTH_CALCULATIONS compensation on month calculations.
+	- Added additionnal test cases for standard month, and intuitive months calculations. 
+
+0.15 Mars 13 2002
 	- Reverted the fixes in version 0.14. POSIX does it's own day light compensation.
 	- Fixed a problem that caused the original reference of a date to be modified
 	when adding seconds to it.

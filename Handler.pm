@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.15';
+$VERSION = '0.18';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -16,6 +16,10 @@ use constant DEFAULT_TIMEZONE => 'GMT';
 use constant DEFAULT_LOCALE => 'en_US';
 
 use constant DELTA_CLASS => 'Date::Handler::Delta';
+
+use constant INTUITIVE_MONTH_CALCULATIONS => 0;
+use constant INTUITIVE_TIME_CALCULATIONS => 0;
+use constant INTUITIVE_DST_ADJUSTMENTS => 0;
 
 use overload (
 	'""'	=> 'AsScalar',
@@ -82,19 +86,22 @@ sub new
 	}
 	elsif(ref($date) =~ /HASH/)
 	{
-		$self->{epoch} = $self->Array2Epoch([
-												$date->{year},
-												$date->{month},
-												$date->{day},
-												$date->{hour},
-												$date->{min},
-												$date->{sec},
-											]);
+		$self->{epoch} = $self->Array2Epoch([ 
+						$date->{year},
+						$date->{month},
+						$date->{day},
+						$date->{hour},
+						$date->{min},
+						$date->{sec},
+		]);
 	}
 	else
 	{
 		$self->{epoch} = $date;
 	}
+
+	$self->{_intuitive_day} = $args->{intuitive_day} if($self->INTUITIVE_MONTH_CALCULATIONS());
+	$self->{_intuitive_hour} = $args->{intuitive_hour} if($self->INTUITIVE_TIME_CALCULATIONS());
 
 	croak "Date format not recognized." if not defined $self->{epoch};
 
@@ -427,6 +434,30 @@ sub IsLeapYear
 	return 0;
 }
 
+sub IntuitiveDay
+{
+	my $self = shift;
+	my $intuitive_day = shift;
+
+	if($intuitive_day)
+	{
+		$self->{_intuitive_day} = $intuitive_day;	
+	}
+	return $self->{_intuitive_day};
+}
+
+sub IntuitiveHour
+{
+	my $self = shift;
+	my $intuitive_hour = shift;
+	
+	if($intuitive_hour)
+	{
+		$self->{_intuitive_hour} = $intuitive_hour;
+	}
+	return $self->{_intuitive_hour};
+}
+
 sub Array2Epoch
 {
 	my $self = shift;
@@ -467,7 +498,7 @@ sub AsArray
 	$y += 1900;
 	$m += 1;
 
-	return [ $y,$m,$d,$h,$mm,$ss];
+	return [$y,$m,$d,$h,$mm,$ss];
 }
 
 sub AsHash
@@ -483,7 +514,7 @@ sub AsHash
 				hour => $self_array->[3],
 				min => $self_array->[4],
 				sec => $self_array->[5],
-			};
+	};
 }
 
 
@@ -493,28 +524,18 @@ sub Add
 
 	if(!ref($delta))
 	{
-		my $epoch = $self->Epoch();
-		$epoch += $delta;
-
-		my $newdate = ref($self)->new({ 
-			date => $epoch,
-			time_zone => $self->TimeZone(),
-		});
-
-		return $newdate;
+		$delta = $self->DELTA_CLASS()->new([0,0,0,0,0,$delta]);
+		return $self + $delta;
 	}
 	elsif($delta->isa($self->DELTA_CLASS()))
 	{
 		local $ENV{'TZ'} = $self->TimeZone();
 		local $ENV{'LC_TIME'} = $self->Locale();
 
+
 		my $epoch = $self->{epoch};
 
 		my $newdate = ref($self)->new({ date => $epoch, time_zone => $self->TimeZone() });
-
-		#Take care of the seconds.
-		$epoch += $delta->Seconds();
-		$newdate->Epoch($epoch);
 
 		my $self_array = $newdate->AsArray();
 		#Take care of the months.
@@ -526,9 +547,115 @@ sub Add
 		#Take care of the years.
 		$self_array->[0] += $years;
 
-		my $return_date =  ref($self)->new({ date => $self_array, time_zone => $self->TimeZone() });
-			
-		return $return_date;
+		my $posix_date = ref($self)->new({ date => $self_array,
+						 time_zone => $self->TimeZone(), 
+		});
+
+		if($self->INTUITIVE_MONTH_CALCULATIONS())
+		{
+			if((($self->Month() + $delta->Months() - 1) % 12 + 1) != $posix_date->Month())
+			{
+				my $compensation_seconds = 86400 * $posix_date->Day();
+				my $compensated_epoch = $posix_date->Epoch();
+	
+				$compensated_epoch -= $compensation_seconds;
+	
+				$posix_date->Epoch($compensated_epoch);
+	
+				$posix_date->{_intuitive_day} = $self->{_intuitive_day} || $self->Day();
+			}
+			else
+			{
+				if($self->{_intuitive_day})
+				{
+					my $lastdayofmonth = $self->{_intuitive_day};
+					my $compensated_seconds = 86400 * ($lastdayofmonth - $posix_date->Day());
+					if($compensated_seconds > 0)
+					{
+						my $epoch = $posix_date->Epoch();
+						$epoch += $compensated_seconds;
+						$posix_date->Epoch($epoch);
+					}
+	
+					if($self->{_intuitive_day} > $lastdayofmonth)
+					{
+						$posix_date->{_intuitive_day} = $self->{_intuitive_day};
+					}
+					
+				}
+			}
+		}
+
+		#Take care of the seconds
+		my $posix_epoch = $posix_date->Epoch();
+		$posix_epoch += $delta->Seconds();
+		$posix_date->Epoch($posix_epoch);
+
+
+		my $adjustment_epoch = $posix_date->Epoch();
+
+		if($posix_date->DayLightSavings() && !$self->DayLightSavings())
+		{
+			my $posix_hour = $posix_date->Hour();
+			$posix_hour -= 1;
+			$posix_date->{_intuitive_hour} = $posix_hour;
+
+			if($self->INTUITIVE_DST_ADJUSTMENTS())
+			{
+				$adjustment_epoch -= 3600;	
+				$posix_date->Epoch($adjustment_epoch);
+
+				$posix_hour = 0 if $posix_hour == 24;	
+				if($posix_date->Hour() != $posix_hour)
+				{
+					$adjustment_epoch += 3600;
+					$posix_date->Epoch($adjustment_epoch);
+				}	
+			}
+		}
+		elsif(!$posix_date->DayLightSavings() && $self->DayLightSavings())
+		{
+
+			my $posix_hour = $posix_date->Hour();
+			$posix_hour += 1;
+			$posix_date->{_intuitive_hour} = $posix_hour;
+
+			if($self->INTUITIVE_DST_ADJUSTMENTS())
+			{
+				$adjustment_epoch += 3600;
+				$posix_date->Epoch($adjustment_epoch);
+
+				$posix_hour = 0 if $posix_hour == 24;	
+				if($posix_date->Hour() != $posix_hour)
+				{
+					$adjustment_epoch -= 3600;
+					$posix_date->Epoch($adjustment_epoch);
+				}	
+			}
+		}
+
+		if($self->INTUITIVE_TIME_CALCULATIONS())
+		{
+			if(defined $self->{_intuitive_hour})
+			{
+				my $hour = $posix_date->Hour();
+				my $intuitive_epoch = $posix_date->Epoch();
+
+				if($hour > $self->{_intuitive_hour})
+				{		
+					$intuitive_epoch -= 3600;
+					$posix_date->Epoch($intuitive_epoch);
+				}
+				#elsif($hour < $self->{_intuitive_hour})
+				#{
+				#	print STDERR "Intuitive Adjust +1 hour\n";
+				#	$intuitive_epoch += 3600;
+				#	$posix_date->Epoch($intuitive_epoch);
+				#}
+			}
+		}
+
+		return $posix_date;
 
 	}
 	else
@@ -544,15 +671,8 @@ sub Sub
 
 	if(!ref($delta))
 	{
-		my $epoch = $self->Epoch();
-		$epoch -= $delta;
-
- 		my $newdate = ref($self)->new({
-                        date => $epoch,
-                        time_zone => $self->TimeZone(),
-                });
-
-		return $newdate;
+		$delta = $self->DELTA_CLASS()->new([0,0,0,0,0,$delta]);
+		return $self - $delta;
 	}
 	elsif($delta->isa($self->DELTA_CLASS()))
 	{
@@ -561,15 +681,6 @@ sub Sub
 	elsif($delta->isa('Date::Handler'))
 	{
 
-		#my $s_month = $delta->Month();
-		#my $e_month = $self->Month();
-		#my $s_year = $delta->Year();
-		#my $e_year = $self->Year();
-#
-#		my $years = $e_year - $s_year;
-#		my $months = $e_month - $s_month + (12 * $years);
-
-		
 		my $seconds = $self->Epoch() - $delta->Epoch();
 
 		if(($self->DayLightSavings() && !$delta->DayLightSavings()) ||
@@ -657,6 +768,8 @@ sub AllInfo
 	$out_string .= "Leap Year: ".$self->IsLeapYear()."\n";
 	$out_string .= "DaysInYear: ".$self->DaysInYear()."\n";
 	$out_string .= "DaysLeftInYear: ".$self->DaysLeftInYear()."\n";
+	$out_string .= "Intuitive Day: ".$self->IntuitiveDay()."\n";
+	$out_string .= "Intuitive Hour: ".$self->IntuitiveHour()."\n";
 	$out_string .= "\n\n";
 	return $out_string;
 }

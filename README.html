@@ -23,6 +23,9 @@
 	</UL>
 
 	<LI><A HREF="#inheritance">INHERITANCE</A></LI>
+	<LI><A HREF="#using intuitive month calculations (off by default)">USING INTUITIVE MONTH CALCULATIONS (off by default)</A></LI>
+	<LI><A HREF="#using intuitive_dst_adjustments (off by default)">USING INTUITIVE_DST_ADJUSTMENTS (off by default)</A></LI>
+	<LI><A HREF="#using intuitive_time_calculations (off by default)">USING INTUITIVE_TIME_CALCULATIONS (off by default)</A></LI>
 	<LI><A HREF="#notes on time zones, localisation and formatting">NOTES ON TIME ZONES, LOCALISATION AND FORMATTING</A></LI>
 	<LI><A HREF="#other date::handler modules">OTHER DATE::HANDLER MODULES</A></LI>
 	<UL>
@@ -44,7 +47,7 @@
 <HR>
 <P>
 <H1><A NAME="name">NAME</A></H1>
-<P>Date::Handler - Easy but complete date object (0.15)</P>
+<P>Date::Handler - Easy but complete date object (0.17)</P>
 <P>
 <HR>
 <H1><A NAME="synopsis">SYNOPSIS</A></H1>
@@ -206,6 +209,8 @@ also supports localisation using POSIX where available.</P>
 </UL>
 <P>The optional 'time_zone' key represents the time zone name this date is considered in.  i.e. Africa/Dakar, EST, PST, EDT</P>
 <P>The optional 'locale' key represents the locale used to represent this date. i.e. spanish, japananese, de_DE , fr_FR</P>
+<P>You can also pass an 'intuitive_day' key to the constructor. This is described in the
+``USING INTUITIVE MONTH CALCULATIONS'' section.</P>
 <P>
 <H2><A NAME="accessors">Accessors</A></H2>
 <P>You can access the data inside the object using any of the provided methods.
@@ -327,6 +332,81 @@ timezone different than the machine's timezone.</P>
         __END__</PRE>
 <P>
 <HR>
+<H1><A NAME="using intuitive month calculations (off by default)">USING INTUITIVE MONTH CALCULATIONS (off by default)</A></H1>
+<P>Date::Handler contains a feature by witch a date handler object can use intuitive
+month calculation. This means that Date::Handler will compensate for month
+overflows during delta operations.</P>
+<P>For example, if you have a date handler that is 2002/01/30, and you add to it a delta
+of 1 month, standard Date::Handler object will give you a new object that is 2002/03/02.
+This is because POSIX will compensate for the month overflow and add 2 days to the date
+because February does not have a 29 or 30th in 2002. Date::Handler can compensate for
+that by using the INTUITIVE_MONTH_CALCULATIONS constant. (this is turned off by default).</P>
+<P>This constant can be turned on during overloading (inheritance):</P>
+<PRE>
+        use constant INTUITIVE_MONTH_CALCULATIONS =&gt; 1;</PRE>
+<P>Turning this constant on will tell Date::Handler to follow track of month overflow during
+operations. This will make it so that adding a month to 2002/01/30 will bring you to 
+2002/02/28. Adding another month to this will bring you (with intuition) to 2002/03/30, 
+because Date::Handler keeps track of the ``intuitive'' day of the month.</P>
+<P>Using INTUITIVE_MONTH_CALCULATIONS will also make it possible to pass an ``intuitive_day'' 
+key to the <CODE>new()</CODE> constructor in order to simulate a previous addition.</P>
+<PRE>
+        i.e.
+</PRE>
+<PRE>
+
+        my $date = Date::Handler-&gt;new({ 
+                                date =&gt; [2002,02,28,1,0,0,0], 
+                                time_zone =&gt; 'America/Montreal',
+                                intuitive_day =&gt; '30',
+        });</PRE>
+<PRE>
+        my $onemonth = Date::Handler::Delta-&gt;new([0,1,0,0,0,0]);</PRE>
+<PRE>
+        print ($date + $onemonth).&quot;\n&quot;;</PRE>
+<P>In this example, the start date of 2002/02/28 with intuitive_day set to 30 will make it
+so that adding 1 month to the date will bring us to march 30th. Note that INTUITIVE_MONTH_CALCULATIONS will only affect month/day calculations and no time modifications will be applied.</P>
+<P>
+<HR>
+<H1><A NAME="using intuitive_dst_adjustments (off by default)">USING INTUITIVE_DST_ADJUSTMENTS (off by default)</A></H1>
+<P>Date::Handler provides a facility called INTUITIVE_DST_ADJUSTMENTS. This is implemented via an
+inherited constant, like the other options above. When INTUITIVE_DST_ADJUSTMENTS are turned on, 
+Date::Handler will compensate for day light savings changes. For example, 2002/04/07 1AM + 1 day
+would give you 2002/04/08 1AM instead of 2AM. Note that INTUITIVE_DST_ADJUSTMENTS will not apply
+this compensation when the exact ``turn over'' date/time is detected. For example, 2002/04/06 2AM
++ 1 day would give you 2002/04/07 3AM because we don't compensate for this specific case.</P>
+<P>
+<HR>
+<H1><A NAME="using intuitive_time_calculations (off by default)">USING INTUITIVE_TIME_CALCULATIONS (off by default)</A></H1>
+<P>Date::Handler provides yet another facility to add intuitive date calculations. By using
+INTUITIVE_TIME_CALCULATIONS (via inherited constant), Date::Handler will ``remember'' that it
+compensated for a DST adjustment and try to compensate for it.</P>
+<P>For example, 2002/04/06 2AM + 1day would give you 2002/04/07 3AM. Adding a day to this date
+under INTUITIVE_TIME_CALCULATIONS would give you 2002/04/08 2AM because Date::Handler remembers
+it compensated for day light savings.</P>
+<P>Combining INTUITIVE_DST_ADJUSTMENTS, INTUITIVE_MONTH_CALCULATIONS and INTUITIVE_TIME_CALCULATIONS
+will give a behaviour closer to the way humans expect the module to react.</P>
+<P>This can be very useful to make date calculations a little more ``humanized''.</P>
+<P>The intuitive ``hour'' can be faked by passing it to the <CODE>new()</CODE> constructor:</P>
+<PRE>
+        package MyDateHandler;</PRE>
+<PRE>
+        use strict;
+        use base qw(Date::Handler);</PRE>
+<PRE>
+        use constant INTUITIVE_DST_ADJUSTMENTS =&gt; 1;
+        use constant INTUITIVE_TIME_CALCULATIONS =&gt; 1;</PRE>
+<PRE>
+        1;</PRE>
+<P>then:</P>
+<PRE>
+        my $date = MyDateHandler-&gt;new({ 
+                        date =&gt; [2002,04,08,5,0,0], 
+                        time_zone =&gt; 'America/Montreal',
+                        intuitive_hour =&gt; 2,
+        });</PRE>
+<P>
+<HR>
 <H1><A NAME="notes on time zones, localisation and formatting">NOTES ON TIME ZONES, LOCALISATION AND FORMATTING</A></H1>
 <P>Date::Handler supports locales using POSIX <CODE>setlocale()</CODE> functions. The allowed values for the locale
 are listed (on most unix system) using the `locale -a` command. The Date::Handler defaults to ``en_US'' for
@@ -428,7 +508,7 @@ terms as Perl itself.</P>
 
 <LI><STRONG><A NAME="item_Phillippe_M%2E_Chiasson_%3Cgozer%40cpan%2Eorg%3E">Phillippe M. Chiasson &lt;<A HREF="mailto:gozer@cpan.org">gozer@cpan.org</A>&gt;</A></STRONG><BR>
 
-<LI><STRONG><A NAME="item_Patrick_Bradley_%3Cpeanut%40burstofindifference%2E">Patrick Bradley &lt;<A HREF="mailto:peanut@burstofindifference.com">peanut@burstofindifference.com</A>&gt;</A></STRONG><BR>
+<LI><STRONG><A NAME="item_Jamie_Letual_%3Cjamie%40letual%2Enet%3E">Jamie Letual &lt;<A HREF="mailto:jamie@letual.net">jamie@letual.net</A>&gt;</A></STRONG><BR>
 
 </UL>
 <P>
