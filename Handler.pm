@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.18';
+$VERSION = '0.19';
 
 use POSIX qw(floor strftime mktime setlocale);
 
@@ -149,7 +149,6 @@ sub TimeZone
 	if(@_)
 	{
 		my $time_zone = shift;
-
 		$self->{time_zone} = $time_zone;
 	}
 
@@ -593,12 +592,14 @@ sub Add
 
 
 		my $adjustment_epoch = $posix_date->Epoch();
+		my $add_intuitive_hour = 0;
+		my $intuitive_hour;
 
 		if($posix_date->DayLightSavings() && !$self->DayLightSavings())
 		{
 			my $posix_hour = $posix_date->Hour();
 			$posix_hour -= 1;
-			$posix_date->{_intuitive_hour} = $posix_hour;
+			$intuitive_hour = $posix_hour;
 
 			if($self->INTUITIVE_DST_ADJUSTMENTS())
 			{
@@ -608,6 +609,7 @@ sub Add
 				$posix_hour = 0 if $posix_hour == 24;	
 				if($posix_date->Hour() != $posix_hour)
 				{
+					$add_intuitive_hour = 1;
 					$adjustment_epoch += 3600;
 					$posix_date->Epoch($adjustment_epoch);
 				}	
@@ -618,7 +620,7 @@ sub Add
 
 			my $posix_hour = $posix_date->Hour();
 			$posix_hour += 1;
-			$posix_date->{_intuitive_hour} = $posix_hour;
+			$intuitive_hour = $posix_hour;
 
 			if($self->INTUITIVE_DST_ADJUSTMENTS())
 			{
@@ -628,6 +630,7 @@ sub Add
 				$posix_hour = 0 if $posix_hour == 24;	
 				if($posix_date->Hour() != $posix_hour)
 				{
+					$add_intuitive_hour = 1;
 					$adjustment_epoch -= 3600;
 					$posix_date->Epoch($adjustment_epoch);
 				}	
@@ -636,6 +639,11 @@ sub Add
 
 		if($self->INTUITIVE_TIME_CALCULATIONS())
 		{
+			if($add_intuitive_hour)
+			{
+				$posix_date->{_intuitive_hour} = $intuitive_hour;
+			}
+
 			if(defined $self->{_intuitive_hour})
 			{
 				my $hour = $posix_date->Hour();

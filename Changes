@@ -1,6 +1,9 @@
 Revision history for Perl extension Date::handler.
 Maintained by <bbeausej@pobox.com>
 
+0.19 Mar 26 2002
+	- Fixed problems with intuitive_hour being passed causing a one hour delayed date.
+
 0.18 Mar 21 2002
 	- Introduced INTUITIVE_TIME_CALCULATIONS()
 	- Introduced INTUITIVE_DST_ADJUSTMENT()
